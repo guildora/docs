@@ -1,4 +1,4 @@
-# Marketplace – Internal Documentation
+# Marketplace Internals
 
 Canonical technical documentation for the Marketplace app.
 

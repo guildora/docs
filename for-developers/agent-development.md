@@ -1,16 +1,29 @@
-# Developing Guildora Apps with AI Agents
+# AI Agent Workflow
 
 Guildora apps follow a strict, well-defined structure (`manifest.json`, `src/pages/`, `src/api/`, `src/bot/hooks.ts`). This predictability makes AI coding assistants highly effective — they can reason about the full app without needing to explore an unknown codebase.
 
-## Setup: What to Give the Agent
+## Read First
 
-### The AGENTS.md File
+- `../AGENTS.md` — cross-repo rules and platform conventions
+- `./index.md` — app model, lifecycle, and reading order
+- `./manifest.md` — manifest schema
+- `./hub-integration.md` — pages and API routes
+- `./bot-integration.md` — bot hooks and slash commands
+- `./config-fields.md` — admin configuration model
+- `./i18n.md` — translation rules
+- `./submission.md` — sideloading and marketplace publishing
+- `../DESIGN_SYSTEM.md` — shared UI rules
 
-Every Guildora app repo should have an `AGENTS.md`. The app template ships with a comprehensive one at:
+### App Repo AGENTS.md
 
-https://github.com/guildora/docs/blob/main/for-developers/AGENTS.md
+Every Guildora app repo should still have its own `AGENTS.md`.
 
-This file contains the full manifest schema, Hub integration guide, bot hook reference, design system rules, common mistakes, and a test checklist. Copy it into your repo as the starting point.
+Keep it repo-specific:
+- current app purpose
+- important implementation constraints
+- key files and workflows
+- links back to the canonical docs above
+- project-specific test or release rules
 
 ### MCP Access to Docs (Claude Code)
 
@@ -40,7 +53,7 @@ The agent can then call:
 
 ---
 
-## Workflow: Task-Oriented Prompting
+## Task-Oriented Prompting
 
 ### Starting a New App
 
@@ -73,7 +86,7 @@ against the hook name conventions in the bot integration docs.
 ### Before Submitting
 
 ```
-Review my app against the test checklist in the developer AGENTS.md.
+Review my app against the test checklist in this document.
 Check that all manifest fields are correct, all files exist, and spacing follows the 8px grid.
 ```
 
@@ -85,7 +98,7 @@ Check that all manifest fields are correct, all files exist, and spacing follows
 
 When starting a new session on an existing app:
 ```
-Read AGENTS.md first. Then read manifest.json to understand the app structure.
+Read the app repo's AGENTS.md first. Then read manifest.json to understand the app structure.
 What are we working on today?
 ```
 
@@ -94,7 +107,7 @@ What are we working on today?
 Let the agent derive the implementation from `manifest.json` rather than writing code first:
 ```
 Read manifest.json, then implement all pages, API routes, and bot hooks listed in it.
-Follow the patterns in AGENTS.md exactly.
+Follow the platform docs and the current repo rules exactly.
 ```
 
 ### Commit Recommendations
@@ -106,7 +119,7 @@ After completing each file or logical block, suggest a commit with a Conventiona
 
 ---
 
-## Design System Rules for Agents
+## Design Rules for Agents
 
 This is the most common source of mistakes in AI-generated Guildora app code.
 
@@ -139,8 +152,8 @@ Before completing a task or recommending a commit, the agent should verify:
 - [ ] `onInteraction` in `botHooks` if using `botCommands`
 
 **Code**
-- [ ] All `pages[].file` paths point to existing files
-- [ ] All `apiRoutes[].file` paths point to existing files
+- [ ] All `pages[].component` paths point to existing files
+- [ ] All `apiRoutes[].handler` paths point to existing files
 - [ ] `src/bot/hooks.ts` exports all functions listed in `botHooks`
 - [ ] Config values always have fallbacks (`config.key ?? defaultValue`)
 - [ ] Bot hooks use `await` on all async db calls
@@ -161,7 +174,7 @@ Before completing a task or recommending a commit, the agent should verify:
 ## Do's and Don'ts
 
 ### Do
-- Feed `AGENTS.md` to the agent at the start of every session
+- Feed the app repo's `AGENTS.md` to the agent at the start of every session
 - Let the agent scaffold code from `manifest.json` (manifest-first approach)
 - Ask for commit recommendations after each logical block
 - Have the agent run through the test checklist before marking a feature done

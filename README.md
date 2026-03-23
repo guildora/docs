@@ -1,52 +1,17 @@
-# Guildora Documentation
+# Guildora Docs
 
-Guildora is an open-source community platform built for Discord communities. It consists of a **Hub** (web app for members), a **Bot** (Discord event processor), a **Marketplace** (community extensions), and a **CMS** (editorial content).
+Central documentation for Guildora.
 
-This is the central documentation repository. All documentation for the Guildora platform lives here.
+Guildora consists of a **Hub** (member web app), **Bot** (Discord event processor), **Marketplace** (community extensions), and **CMS** (editorial content).
 
----
+## Start Here
 
-## Who are you?
+- Users: [for-users/index.md](./for-users/index.md)
+- Hosters: [for-hosters/index.md](./for-hosters/index.md)
+- Developers: [for-developers/index.md](./for-developers/index.md)
+- Maintainers: [internals/index.md](./internals/index.md)
 
-### I'm a community member using Guildora
-→ [for-users/](./for-users/README.md) — Learn about the platform and its features.
+## Key References
 
-### I want to run my own Guildora instance
-→ [for-hosters/](./for-hosters/README.md) — Setup, configuration, and deployment guides.
-
-### I want to build apps for Guildora
-→ [for-developers/](./for-developers/README.md) — App SDK, manifest reference, Hub/Bot integration, and how to publish to the Marketplace.
-
-### I'm a platform maintainer
-→ [internals/](./internals/README.md) — Architecture, domain model, API contracts, and internal workflows.
-
----
-
-## Design System
-
-→ [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) — Tokens, typography, color palette, component standards. Single source of truth for all Guildora apps.
-
----
-
-## For AI Agents
-
-→ [AGENTS.md](./AGENTS.md) — Cross-repo conventions and platform context for AI coding assistants.
-
-**MCP access (Claude Code):** Register the `guildora-docs` server in `~/.claude/settings.json` to access all docs via `read_file` and `list_files` tools directly from your editor.
-
-```json
-{
-  "mcpServers": {
-    "guildora-docs": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/Newguild/docs"]
-    }
-  }
-}
-```
-
----
-
-## Architecture Decisions
-
-→ [decisions/](./decisions/) — Architectural decision records (ADRs).
+- Design system: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
+- Agent context: [AGENTS.md](./AGENTS.md)

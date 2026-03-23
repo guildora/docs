@@ -38,4 +38,4 @@ The marketplace app runs separately — see [internals/marketplace/architecture.
 
 The Marketplace is a standalone Nuxt 4 app that runs separately from the core Guildora services. The Hub embeds it in an `<iframe>`. You can run it on the same server or independently.
 
-See [internals/marketplace/](../internals/marketplace/README.md) for details.
+See [internals/marketplace/](../internals/marketplace/index.md) for details.

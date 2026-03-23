@@ -1,4 +1,4 @@
-# Guildora – Internal Documentation
+# Guildora Internals
 
 Canonical technical documentation for the Guildora monorepo.
 

@@ -1,4 +1,4 @@
-# Submission: Sideloading & Marketplace Publishing
+# Submission
 
 ## Sideloading (for Testing)
 
