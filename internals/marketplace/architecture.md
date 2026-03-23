@@ -61,18 +61,13 @@ SSR request for /
 #### Marketplace (`/apps`, `/apps/:id`)
 
 1. Browser calls `/api/marketplace/apps` (same-origin Nitro route).
-2. Nitro handler reads `config.hubApiUrl` from private runtime config.
-3. Handler calls `{hubApiUrl}/api/marketplace/apps` server-side via `$fetch`.
-4. Hub API returns list of approved apps (CORS headers, 60s cache).
-5. Response is forwarded to the browser.
-
-The browser never learns the internal Hub URL.
+2. Nitro handler fetches approved apps from the Hub API.
+3. Response is forwarded to the browser.
 
 ### Runtime Config (Web)
 
 ```ts
 runtimeConfig: {
-  hubApiUrl: "http://localhost:3003",   // server-only
   public: {
     githubUrl: "#",
     hubUrl:    "http://localhost:3003"
@@ -81,7 +76,6 @@ runtimeConfig: {
 ```
 
 Environment variable overrides:
-- `NUXT_HUB_API_URL` → `config.hubApiUrl`
 - `NUXT_PUBLIC_GITHUB_URL` → `config.public.githubUrl`
 - `NUXT_PUBLIC_HUB_URL` → `config.public.hubUrl`
 

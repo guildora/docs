@@ -71,7 +71,6 @@ The Marketplace app runs on port 3004 by default and is deployed separately. The
 
 Required env vars for the marketplace:
 ```
-NUXT_HUB_API_URL=http://hub:3003       # server-side only
 NUXT_PUBLIC_HUB_URL=https://hub.example.com
 NUXT_PUBLIC_GITHUB_URL=https://github.com/guildora/guildora
 ```
