@@ -9,7 +9,7 @@ Guildora consists of a **Hub** (member web app), **Bot** (Discord event processo
 - Users: [for-users/index.md](./for-users/index.md)
 - Hosters: [for-hosters/index.md](./for-hosters/index.md)
 - Developers: [for-developers/index.md](./for-developers/index.md)
-- Maintainers: [internals/index.md](./internals/index.md)
+- Architecture & Systems: [architecture-systems/index.md](./architecture-systems/index.md)
 
 ## Key References
 

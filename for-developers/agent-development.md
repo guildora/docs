@@ -123,17 +123,32 @@ After completing each file or logical block, suggest a commit with a Conventiona
 
 This is the most common source of mistakes in AI-generated Guildora app code.
 
-**App pages run inside the Hub and inherit its theme.** The agent must:
+**App pages run inside the Hub and inherit its theme.**
 
 | Rule | Detail |
 |---|---|
 | Use CSS variables | `var(--color-text-primary)`, `var(--color-accent)`, etc. — never hex |
 | Use Hub CSS classes | `card`, `btn btn-primary btn-sm`, `alert alert-error` |
+| **Use `.field*` for all forms** | `.field`, `.field__control`, `.field__input`, `.field__select`, `.field__textarea` — never bare `.input`/`.select`/`.textarea` |
 | Respect spacing grid | Only tokens: `1, 2, 3, 4, 6, 8, 12, 16, 24, 32` — no `*-5` |
-| No DaisyUI sub-classes | `card-body`, `stat-title`, `stat-value` are **not defined** |
 | No Tailwind color utils | `text-primary`, `bg-base-200`, `border-base-300` are **unreliable** |
 | No font classes | DM Sans is injected globally — do not set any font |
 | No imports for composables | `useI18n`, `useAuth`, `useFetch` are globally injected |
+
+### Why `.field*` for forms?
+
+The Hub's input background uses `var(--color-field-bg)` which automatically adjusts to be one surface level above the container. Using bare `.input` or native `<input>` without `.field__control` results in invisible inputs on surface-2 backgrounds (the most common card level in app pages).
+
+**Correct form pattern:**
+```html
+<div class="field">
+  <label class="field__label" for="ch-id">Channel ID</label>
+  <div class="field__control">
+    <input id="ch-id" v-model="channelId" type="text" class="field__input" />
+  </div>
+  <span class="field__hint">Discord channel or category ID</span>
+</div>
+```
 
 Full reference: https://github.com/guildora/docs/blob/main/DESIGN_SYSTEM.md
 
@@ -161,7 +176,7 @@ Before completing a task or recommending a commit, the agent should verify:
 **Design**
 - [ ] No hardcoded hex colors — CSS variables only
 - [ ] No `font-nunito` or any font class
-- [ ] No DaisyUI compound sub-classes
+- [ ] All form inputs use `.field__control` + `.field__input` / `.field__select` / `.field__textarea` — not bare `.input` / `.select` / `.textarea`
 - [ ] Spacing follows 8px grid (`p-6`, `gap-4`, `space-y-6`, `mb-4`, `mt-8`)
 - [ ] No `*-5` spacing tokens
 
@@ -181,7 +196,7 @@ Before completing a task or recommending a commit, the agent should verify:
 - Use the MCP `read_file` tool to access the latest doc versions
 
 ### Don't
-- Let the agent use DaisyUI compound sub-classes — they are not defined in the Hub
+- Let the agent use bare `.input`, `.select`, `.textarea` classes for form fields — use `.field__control` + `.field__input` etc.
 - Let the agent import host composables — they are globally injected, imports break
 - Let the agent hardcode hex colors — only CSS variables
 - Let the agent use `#ff206e` as an accent color fallback — that is the Marketplace color, not the Hub

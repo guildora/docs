@@ -35,7 +35,7 @@ example.com {
 }
 
 cms.example.com {
-    reverse_proxy cms:3002
+    reverse_proxy cms:3001
 }
 ```
 
@@ -65,18 +65,13 @@ Keep these values strong and private:
 - Discord sync endpoints depend on bot internal server availability
 - The landing OAuth shim is a fallback — production OAuth should point directly to hub
 
-## Marketplace (Separate Deployment)
+## Marketplace Integration (Managed Service)
 
-The Marketplace app runs on port 3004 by default and is deployed separately. The hub embeds it via iframe. See [internals/marketplace/architecture.md](../internals/marketplace/architecture.md).
+Marketplace is not self-hosted in this stack. Treat it as an external platform service.
 
-Required env vars for the marketplace:
-```
-NUXT_PUBLIC_HUB_URL=https://hub.example.com
-NUXT_PUBLIC_GITHUB_URL=https://github.com/guildora/guildora
-```
-
-Hub side:
+Hub side configuration remains optional and embed-focused:
 ```
 NUXT_PUBLIC_MARKETPLACE_EMBED_URL=https://marketplace.example.com
-MARKETPLACE_CORS_ORIGIN=https://marketplace.example.com
 ```
+
+For API/data contract details between Hub and Marketplace, see [architecture-systems/marketplace/api.md](../architecture-systems/marketplace/api.md).

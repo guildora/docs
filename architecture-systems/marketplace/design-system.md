@@ -46,7 +46,7 @@ The portal layout uses `data-section="portal"` to scope a blue accent (`#2563EB`
 | `shadow-card` | `var(--shadow-md)` | Card shorthand |
 | `shadow-elevated` | `var(--shadow-lg)` | Elevated shorthand |
 
-## DaisyUI Classes
+## CSS Classes
 
 ### Buttons
 ```html
@@ -61,7 +61,7 @@ Buttons have `border-radius: 0.5rem` (8px).
 
 ### Cards
 ```html
-<div class="card p-6">  <!-- surface-2 background, 12px radius, border -->
+<div class="card p-6">  <!-- surface-2 background, 12px radius -->
 ```
 
 ## Layout Convention
@@ -84,5 +84,5 @@ The default layout has **no** container. Each section controls its own width:
 
 ## Sources
 
-- Tokens and overrides: `apps/web/app/assets/css/main.css`
-- Tailwind theme extensions: `apps/web/tailwind.config.ts`
+- Tokens and overrides: `app/assets/css/main.css` (root app) or `apps/web/app/assets/css/main.css` (legacy)
+- Tailwind theme extensions: `tailwind.config.ts` (root app) or `apps/web/tailwind.config.ts` (legacy)

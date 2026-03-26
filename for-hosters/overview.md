@@ -25,17 +25,19 @@ All services share a single **PostgreSQL** database via a shared Drizzle schema 
 
 ## Ports (default)
 
-| Service | Default Port |
-|---|---|
-| Landing (`web`) | 3000 |
-| Hub | 3003 |
-| CMS | 3002 |
-| Bot internal sync server | 3050 |
+| Service | Local Dev | Docker |
+|---|---|---|
+| Landing (`web`) | 3000 | 3000 |
+| Hub | 3003 | 3003 |
+| CMS | 3002 | 3001 |
+| Bot internal sync server | 3050 | 3050 |
 
-The marketplace app runs separately — see [internals/marketplace/architecture.md](../internals/marketplace/architecture.md).
+Note: CMS uses port 3002 in local development (`next dev -p 3002`) but port 3001 inside Docker containers. Reverse proxy configs (Caddy) should target the Docker port (3001).
 
-## Marketplace (optional)
+## Marketplace Integration
 
-The Marketplace is a standalone Nuxt 4 app that runs separately from the core Guildora services. The Hub embeds it in an `<iframe>`. You can run it on the same server or independently.
+Marketplace is a platform-managed service and **not part of the self-hosted Guildora stack**. It is not deployed from this hoster setup.
 
-See [internals/marketplace/](../internals/marketplace/index.md) for details.
+The Hub integrates Marketplace data via the Marketplace-provided API and can embed Marketplace UI via iframe when configured.
+
+See [architecture-systems/marketplace/](../architecture-systems/marketplace/index.md) for integration details.

@@ -15,4 +15,4 @@ Documentation for self-hosting a Guildora instance.
 
 ---
 
-Platform internals (architecture, domain model): [internals/guildora/](/docs/internals/guildora)
+Architecture & systems (architecture, domain model): [architecture-systems/guildora/](/docs/architecture-systems/guildora)

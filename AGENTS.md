@@ -8,7 +8,7 @@ Read this first when working anywhere in the Guildora platform.
 ## Repositories
 
 - `guildora/` — core platform: Hub, Landing, CMS, Bot, shared DB
-- `marketplace/` — public marketplace and developer/admin portal
+- `marketplace/` — private marketplace service and developer/admin portal
 - `apps/guildora-app-template/` — starter repo for Guildora apps
 - `docs/` — centralized documentation
 
@@ -17,8 +17,8 @@ Read this first when working anywhere in the Guildora platform.
 - Platform docs hub: `./README.md`
 - Design system: `./DESIGN_SYSTEM.md`
 - App development workflow: `./for-developers/agent-development.md`
-- Guildora internals: `./internals/guildora/index.md`
-- Marketplace internals: `./internals/marketplace/index.md`
+- Guildora architecture & systems: `./architecture-systems/guildora/index.md`
+- Marketplace architecture & systems: `./architecture-systems/marketplace/index.md`
 
 ## Shared Rules
 
@@ -32,6 +32,6 @@ Read this first when working anywhere in the Guildora platform.
 ## Integration Points
 
 - Marketplace embed: Hub sets `NUXT_PUBLIC_MARKETPLACE_EMBED_URL`
-- Marketplace API source: `GET /api/marketplace/apps`
+- Marketplace API source (Hub integration): `GET /api/hub/apps` (Marketplace)
 - CMS SSO: Hub embeds CMS with SSO token
 - Discord OAuth: Bot and Hub share the same Discord application

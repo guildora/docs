@@ -27,9 +27,22 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | hub | `/profile/roles` | `auth` | session |
 | hub | `/profile/design` | `auth` | session |
 | hub | `/profile/:id` | `auth` | session, then redirect |
-| hub | `/marketplace` | `auth` | session |
-| hub | `/marketplace/submit` | none | public redirect to `/marketplace` |
-| hub | `/marketplace/:appId` | none | public redirect to `/marketplace` |
+| hub | `/apps` | `auth` | session |
+| hub | `/apps/explore` | `auth` | session |
+| hub | `/apps/overview` | `auth` | session |
+| hub | `/apps/sideload` | `admin` | admin, superadmin |
+| hub | `/apps/:appId/:slug` | `auth` | session |
+| hub | `/applications` | `moderator` | moderator, admin, superadmin |
+| hub | `/applications/config` | `admin` | admin, superadmin |
+| hub | `/applications/flows` | `moderator` | moderator, admin, superadmin |
+| hub | `/applications/flows/new` | `moderator` | moderator, admin, superadmin |
+| hub | `/applications/flows/:flowId` | `moderator` | moderator, admin, superadmin |
+| hub | `/applications/flows/:flowId/settings` | `moderator` | moderator, admin, superadmin |
+| hub | `/applications/open` | `moderator` | moderator, admin, superadmin |
+| hub | `/applications/open/:applicationId` | `moderator` | moderator, admin, superadmin |
+| hub | `/applications/archive` | `moderator` | moderator, admin, superadmin |
+| hub | `/applications/archive/:applicationId` | `moderator` | moderator, admin, superadmin |
+| hub | `/apply/:flowId/:token` | none | public (token-validated) |
 | hub | `/cms` | `auth` | session at page level; real CMS access enforced by API |
 | hub | `/mod` | `moderator` | moderator, admin, superadmin |
 | hub | `/admin` | `admin` | admin, superadmin |
@@ -76,16 +89,39 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/mod/users/:id/profile` | PUT | moderator, admin, superadmin |
 | `/api/mod/users/:id/community-role` | PUT | moderator, admin, superadmin |
 | `/api/mod/users/:id/sync` | POST | moderator, admin, superadmin |
-| `/api/mod/applications` | GET | moderator, admin, superadmin |
-| `/api/mod/applications/:id/approve` | POST | moderator, admin, superadmin |
-| `/api/mod/applications/:id/reject` | POST | moderator, admin, superadmin |
+| `/api/applications/open` | GET | moderator, admin, superadmin |
+| `/api/applications/:applicationId` | GET | moderator, admin, superadmin |
+| `/api/applications/:applicationId/approve` | POST | moderator, admin, superadmin |
+| `/api/applications/:applicationId/reject` | POST | moderator, admin, superadmin |
+| `/api/applications/:applicationId/retry-roles` | POST | moderator, admin, superadmin |
+| `/api/applications/archive` | GET | moderator, admin, superadmin |
+| `/api/applications/archive/cleanup` | POST | admin, superadmin |
+| `/api/applications/config` | GET | admin, superadmin |
+| `/api/applications/config` | PUT | admin, superadmin |
+| `/api/applications/moderator-notifications` | GET | moderator, admin, superadmin |
+| `/api/applications/moderator-notifications` | PUT | moderator, admin, superadmin |
+| `/api/applications/flows` | GET | moderator, admin, superadmin |
+| `/api/applications/flows` | POST | moderator, admin, superadmin |
+| `/api/applications/flows/:flowId` | GET | moderator, admin, superadmin |
+| `/api/applications/flows/:flowId` | PUT | moderator, admin, superadmin |
+| `/api/applications/flows/:flowId` | DELETE | moderator, admin, superadmin |
+| `/api/applications/flows/:flowId/duplicate` | POST | moderator, admin, superadmin |
+| `/api/apply/:flowId/validate-token` | POST | public (token-based) |
+| `/api/apply/:flowId/submit` | POST | public (token-based) |
+| `/api/apply/:flowId/upload` | POST | public (token-based) |
+| `/api/marketplace/apps` | GET | session |
+| `/api/feedback` | POST | public |
 | `/api/admin/theme` | GET | admin, superadmin |
 | `/api/admin/theme` | PUT | admin, superadmin |
 | `/api/admin/users` | GET | admin, superadmin |
 | `/api/admin/apps` | GET | admin, superadmin |
 | `/api/admin/apps/sideload` | POST | admin, superadmin |
+| `/api/admin/apps/local-sideload` | POST | admin, superadmin |
+| `/api/admin/apps/update-check` | GET | admin, superadmin |
 | `/api/admin/apps/:appId/config` | PUT | admin, superadmin |
 | `/api/admin/apps/:appId/status` | PUT | admin, superadmin |
+| `/api/admin/apps/:appId/auto-update` | POST | admin, superadmin |
+| `/api/admin/apps/:appId/update` | POST | admin, superadmin |
 | `/api/admin/apps/:id` | DELETE | admin, superadmin |
 | `/api/admin/community-settings` | GET | admin, superadmin |
 | `/api/admin/community-settings` | PUT | admin, superadmin |

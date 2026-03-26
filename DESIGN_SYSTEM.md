@@ -13,6 +13,7 @@ Global design system for all Guildora platform projects. This file is the single
 - SaaS quality: professional, trustworthy, modern
 - Optimal UX for non-technical users
 - Every element has a clear purpose — nothing without function
+- **Surfaces use shadow for depth, never borders** — borders are reserved for UI chrome (tab underlines, outline buttons, dividers, spinner rings)
 
 ---
 
@@ -31,27 +32,33 @@ Global design system for all Guildora platform projects. This file is the single
 
 ### Dark Mode (default for all apps)
 
-| Token | Variable | Value |
-|---|---|---|
-| Background | `--color-bg` | `#0A0A0A` |
-| Surface | `--color-surface` | `#111111` |
-| Surface elevated | `--color-surface-elevated` | `#1A1A1A` |
-| Border | `--color-border` | `#1F1F1F` |
-| Text primary | `--color-text-primary` | `#FAFAFA` |
-| Text secondary | `--color-text-secondary` | `#A3A3A3` |
-| Text muted | `--color-text-muted` | `#525252` |
+The Hub uses a granular surface scale (`--color-surface-0` through `--color-surface-5`) and `--color-line` for dividers. The Marketplace uses a similar but slightly different naming. Both follow the same visual intent.
+
+| Token | Hub Variable | Value | Usage |
+|---|---|---|---|
+| Background | `--color-surface-0` / `--color-surface-1` | `#0A0A0A` | Page background |
+| Surface | `--color-surface-2` | `#111111` | Cards, elevated surfaces |
+| Surface elevated | `--color-surface-3` | `#1A1A1A` | Deeper surfaces |
+| Surface hover | `--color-surface-4` | `#222222` | Hover states |
+| Surface active | `--color-surface-5` | `#2A2A2A` | Active states |
+| Field background | `--color-field-bg` | `var(--color-surface-3)` | Input field background |
+| Divider | `--color-line` | `#1F1F1F` | Dividers, borders |
+| Text primary | `--color-text-primary` | `#FAFAFA` | Main text |
+| Text secondary | `--color-text-secondary` | `#A3A3A3` | Secondary text |
+| Text tertiary | `--color-text-tertiary` | `#525252` | Helper texts, labels |
+| Text disabled | `--color-text-disabled` | `rgba(255,255,255,0.3)` | Disabled elements |
 
 ### Light Mode (Hub only)
 
 | Token | Variable | Value |
 |---|---|---|
-| Background | `--color-bg` | `#FAFAFA` |
-| Surface | `--color-surface` | `#FFFFFF` |
-| Surface elevated | `--color-surface-elevated` | `#F4F4F5` |
-| Border | `--color-border` | `#E5E5E5` |
+| Background | `--color-surface-0` / `--color-surface-1` | `#FAFAFA` |
+| Surface | `--color-surface-2` | `#FFFFFF` |
+| Surface elevated | `--color-surface-3` | `#F4F4F5` |
+| Divider | `--color-line` | `#E5E5E5` |
 | Text primary | `--color-text-primary` | `#0A0A0A` |
 | Text secondary | `--color-text-secondary` | `#525252` |
-| Text muted | `--color-text-muted` | `#A3A3A3` |
+| Text tertiary | `--color-text-tertiary` | `#A3A3A3` |
 
 ### Project-Specific Accent Colors
 
@@ -124,13 +131,15 @@ Use these utility classes in Hub app pages to stay aligned with the 8px grid:
 
 ## Shadows
 
-| Token | Value | Usage |
-|---|---|---|
-| `--shadow-sm` | `0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)` | Subtle elements |
-| `--shadow-md` | `0 4px 16px rgba(0,0,0,0.06)` | Cards |
-| `--shadow-lg` | `0 8px 32px rgba(0,0,0,0.08)` | Elevated panels, modals |
+Shadows replace borders for depth — they must be strong enough to stand alone on dark backgrounds.
 
-No neuomorphism. No hard-edged shadows. No blur radius > 32px.
+| Token | Dark mode value | Light mode value | Usage |
+|---|---|---|---|
+| `--shadow-sm` | `0 1px 4px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.09)` | `0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05)` | Inputs, badges, subtle elements |
+| `--shadow-md` | `0 4px 20px rgba(0,0,0,0.22)` | `0 4px 16px rgba(0,0,0,0.08)` | Cards |
+| `--shadow-lg` | `0 8px 40px rgba(0,0,0,0.30)` | `0 8px 32px rgba(0,0,0,0.10)` | Elevated panels, modals, sidebars |
+
+No neuomorphism. No hard-edged shadows. No blur radius > 40px.
 
 ---
 
@@ -147,8 +156,8 @@ No neuomorphism. No hard-edged shadows. No blur radius > 32px.
 
 ### Cards
 
-- Border: 1px solid `--color-border`
-- Shadow: `--shadow-md`
+- No border — `--shadow-md` provides depth
+- Background: `--color-surface-elevated`
 - Radius: 12px
 - Padding: 24px
 - Hover: slightly elevated shadow
@@ -156,10 +165,137 @@ No neuomorphism. No hard-edged shadows. No blur radius > 32px.
 ### Input Fields
 
 - Height: auto (padding-based)
-- Padding: 10px 14px
-- Border: 1px solid `--color-border`
-- Radius: 8px
-- Focus: 2px ring with accent color at 30% opacity
+- Padding: `0.7rem 1rem`
+- No border — `--shadow-sm` + `--color-surface-2` background provides definition
+- Radius: 8px (`0.5rem`)
+- Focus: shadow-based ring on the **container** via `:focus-within` — never `outline` on the inner element
+
+### Forms
+
+#### Field Anatomy
+
+Every field consists of (top to bottom):
+1. **Label** — uppercase, 0.75rem, 600 weight, `--color-text-secondary`
+2. **Control wrapper** (`.field__control`) — shadow-based surface, contains the actual input
+3. **Sub-row** (optional) — hint text left, character counter right
+
+#### Field Gap
+
+`gap-4` (16px) between all fields — never `gap-5` or `gap-6`.
+
+#### States
+
+| State | CSS modifier | Visual |
+|---|---|---|
+| Default | — | `--shadow-sm` on `--color-surface-2` |
+| Hover | — | background `--color-surface-3` |
+| Focus | — | container: `--shadow-sm, 0 0 0 2px rgba(accent, 0.30)` via `:focus-within` |
+| Error | `.field--error` | container: `--shadow-sm, 0 0 0 2px rgba(239,68,68,0.30)` |
+| Success | `.field--success` | container: `--shadow-sm, 0 0 0 2px rgba(34,197,94,0.30)` |
+| Disabled | — | `opacity: 0.5`, `cursor: not-allowed` on inner element |
+
+**Focus rule:** The ring always sits on `.field__control:focus-within` — never `outline` on `<input>`. This keeps surfaces border-free at all times.
+
+**Field background rule:** Inputs always sit one surface level above their container via the `--color-field-bg` CSS variable. The variable is set automatically on `.bg-base-100/200/300`, `.surface-level-*`, and `.bg-surface-*` classes and cascades down to all `.field__control` children. Default (`:root`) is `--color-surface-2`.
+
+#### Sub-row Elements
+
+- **`.field__hint`** — helper text, shown unconditionally below the control; `0.75rem`, `--color-text-muted`
+- **`.field__message`** — validation message (error or success text); `0.75rem`, colored by state
+- **`.field__counter`** — character counter, right-aligned; `0.72rem`, `--color-text-muted`; turns `--color-warning` at 80%, `--color-error` at 100%
+
+#### Field Structure — Input / Select / Textarea
+
+Use the `UiInput`, `UiSelect`, `UiTextarea` components. Available props:
+
+| Prop | Type | Purpose |
+|---|---|---|
+| `label` | `string` (required) | Label text (rendered uppercase) |
+| `required` | `boolean` | Appends `*` to label |
+| `hint` | `string` | Helper text below the field |
+| `error` | `string` | Error message — activates `.field--error` ring |
+| `showCounter` | `boolean` | Show character counter (requires `maxlength`) |
+| `size` | `"md"\|"sm"\|"xs"` | Field size variant |
+
+```html
+<!-- UiInput with hint + error -->
+<UiInput
+  v-model="email"
+  label="E-Mail"
+  type="email"
+  required
+  hint="Wird nur für Benachrichtigungen genutzt"
+  :error="errors.email"
+/>
+
+<!-- UiTextarea with counter -->
+<UiTextarea
+  v-model="bio"
+  label="Bio"
+  :maxlength="500"
+  show-counter
+  hint="Kurze Vorstellung"
+/>
+```
+
+#### Field Structure — Toggle / Checkbox
+
+Use `UiCheckbox`. The `label` prop becomes the section heading above; the `description` slot or prop becomes the inline checkbox label.
+
+```html
+<UiCheckbox
+  v-model="enabled"
+  label="Benachrichtigungen"
+  description="E-Mail-Benachrichtigungen aktivieren"
+  hint="Du kannst dies jederzeit ändern"
+/>
+```
+
+#### Field Groups
+
+Group related fields with `.field-group`. Use `.field-group__title` for a section heading (uses `border-bottom` on `--color-line` — the only allowed border in forms).
+
+```html
+<div class="field-group">
+  <p class="field-group__title">Profil</p>
+  <UiInput v-model="name" label="Name" />
+  <UiInput v-model="email" label="E-Mail" type="email" />
+</div>
+```
+
+#### Leading / Trailing Icons
+
+Both `UiInput` and `UiTextarea` support a `#trailing` slot (and `#leading` slot) for icons:
+
+```html
+<UiInput v-model="search" label="Suche" placeholder="Suchen…">
+  <template #trailing>
+    <Icon name="lucide:search" />
+  </template>
+</UiInput>
+```
+
+#### Raw HTML Pattern (Marketplace / no Vue component)
+
+When Vue components are not available, use the `.field*` CSS classes directly:
+
+```html
+<div class="field">
+  <label class="field__label" for="name">App Name <span aria-hidden="true">*</span></label>
+  <div class="field__control">
+    <input id="name" class="field__input" type="text" required maxlength="150" />
+  </div>
+  <span class="field__hint">Maximal 150 Zeichen</span>
+</div>
+```
+
+#### Rules
+
+- Focus ring is always shadow-based on the container — no `outline` on inner elements
+- No inline description paragraphs below labels — use `hint` prop or `.field__hint`
+- Number / small inputs: fixed width (`w-32`); text inputs: full width (`w-full`)
+- Save button separator: `mt-8 pt-6 border-t border-[var(--color-line)]`
+- Card headings inside single-purpose settings cards are redundant with the page `<h1>` — omit them
 
 ### Navigation
 
@@ -227,16 +363,8 @@ No neuomorphism. No hard-edged shadows. No blur radius > 32px.
 - NO neuomorphism shadows (deprecated)
 - NO sharp-cornered cards (border-radius: 0 is deprecated)
 - NO pill-shaped buttons (9999px radius on buttons is deprecated — use 8px)
-
----
-
-## DaisyUI Theme Names
-
-| App | Theme(s) |
-|---|---|
-| Guildora Hub | `guildora-dark`, `guildora-light` |
-| Guildora Landing | `guildora-dark` |
-| Marketplace | `marketplace-dark` |
+- NO borders on surfaces (cards, modals, panels, inputs, dropdowns) — use shadow instead
+- NO redundant depth signals: if a shadow defines the surface, a border is noise
 
 ---
 
@@ -246,25 +374,43 @@ All apps implement the same CSS variable names with project-specific values:
 
 ```css
 :root {
-  --color-bg: ...;
-  --color-surface: ...;
-  --color-surface-elevated: ...;
-  --color-border: ...;
+  /* Surface scale (granular) */
+  --color-surface-0: ...;  /* page background */
+  --color-surface-1: ...;  /* page background (alias) */
+  --color-surface-2: ...;  /* cards, elevated surfaces */
+  --color-surface-3: ...;  /* deeper surfaces */
+  --color-surface-4: ...;  /* hover states */
+  --color-surface-5: ...;  /* active states */
+  --color-field-bg: var(--color-surface-3);
+  --color-line: ...;       /* dividers, borders */
+
+  /* Text */
   --color-text-primary: ...;
   --color-text-secondary: ...;
-  --color-text-muted: ...;
+  --color-text-tertiary: ...;
+  --color-text-disabled: ...;
+
+  /* Accent */
   --color-accent: ...;
   --color-accent-hover: ...;
   --color-accent-subtle: ...;
+
+  /* Shadows */
   --shadow-sm: ...;
   --shadow-md: ...;
   --shadow-lg: ...;
+
+  /* Typography */
   --font-display: 'DM Sans', sans-serif;
   --font-body: 'DM Sans', sans-serif;
+
+  /* Radii */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-full: 9999px;
+
+  /* Transitions */
   --transition-fast: 150ms ease-out;
   --transition-base: 200ms ease;
   --transition-slow: 300ms ease;

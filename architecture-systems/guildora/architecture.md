@@ -26,7 +26,7 @@ All services use TypeScript. Hub and bot import shared schema and types from `@g
 - Framework: Nuxt 4 with Nitro
 - API style: file-based handlers under `apps/hub/server/api`
 - Authentication: `nuxt-auth-utils` session cookies + Discord OAuth
-- Styling: Tailwind + DaisyUI + internal Ui* component wrappers
+- Styling: Tailwind + internal Ui* component wrappers + custom CSS design system
 - Localization: `@nuxtjs/i18n` plus a global locale middleware backed by DB and cookie context
 - Layout model:
   - `auth` layout for login

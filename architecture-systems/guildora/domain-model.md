@@ -10,6 +10,8 @@ This document describes the application-domain schema defined in `packages/share
 | `app_install_status` | `active`, `inactive`, `error` | `installed_apps.status` |
 | `app_install_source` | `marketplace`, `sideloaded` | `installed_apps.source` |
 | `app_submission_status` | `pending`, `approved`, `rejected` | `app_marketplace_submissions.status` |
+| `application_flow_status` | `draft`, `active`, `inactive` | `application_flows.status` |
+| `application_status` | `pending`, `approved`, `rejected` | `applications.status` |
 
 ## Tables
 
@@ -23,7 +25,9 @@ Primary identity table.
 | `discord_id` | text unique | canonical Discord identity |
 | `email` | text nullable | usually from OAuth |
 | `display_name` | text | serialized profile name |
-| `avatar_url` | text nullable | remote avatar URL |
+| `avatar_url` | text nullable | current avatar URL (local public path preferred) |
+| `avatar_source` | text nullable | avatar origin marker (`local`, `discord`, or null) |
+| `primary_discord_role_name` | text nullable | highest Discord role name snapshot at last successful login |
 | `created_at` | timestamptz | default now |
 | `updated_at` | timestamptz | auto-updated |
 
@@ -234,6 +238,18 @@ Global internal-app theme configuration.
 | `updated_at` | timestamptz | |
 | `updated_by` | uuid nullable FK -> `users.id` | |
 
+### `app_kv`
+
+Key-value storage for installed app data, scoped by app ID.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `app_id` | text | PK part |
+| `key` | text | PK part |
+| `value` | jsonb nullable | |
+
+Composite primary key: `(app_id, key)`.
+
 ### `cms_access_settings`
 
 Controls whether moderators can use embedded CMS access.
@@ -242,6 +258,7 @@ Controls whether moderators can use embedded CMS access.
 | --- | --- | --- |
 | `id` | serial PK | |
 | `allow_moderator_access` | boolean | defaults true |
+| `allow_moderator_apps_access` | boolean | defaults true; controls moderator access to apps module |
 | `updated_at` | timestamptz | |
 | `updated_by` | uuid nullable FK -> `users.id` | |
 
@@ -253,7 +270,113 @@ Global community-level settings used by the internal app.
 | --- | --- | --- |
 | `id` | serial PK | current code treats `id = 1` as the singleton |
 | `community_name` | text nullable | internal sidebar branding |
+| `discord_invite_code` | text nullable | Discord server invite code |
 | `default_locale` | text | `en` or `de` |
+| `updated_at` | timestamptz | |
+| `updated_by` | uuid nullable FK -> `users.id` | |
+
+### `application_flows`
+
+Visual node-based application form definitions (Vue Flow).
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `name` | text | flow display name |
+| `status` | enum | `draft`, `active`, `inactive` |
+| `flow_json` | jsonb | Vue Flow graph definition (`ApplicationFlowGraph`) |
+| `settings_json` | jsonb | flow settings (`ApplicationFlowSettings`) |
+| `created_by` | uuid nullable FK -> `users.id` | creator |
+| `created_at` | timestamptz | |
+| `updated_at` | timestamptz | auto-updated |
+
+### `application_flow_embeds`
+
+Discord message embeds for application flows (posted by bot).
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `flow_id` | uuid FK -> `application_flows.id` | cascade delete |
+| `discord_channel_id` | text | target Discord channel |
+| `discord_message_id` | text nullable | posted message ID |
+| `active` | boolean | defaults true |
+| `created_at` | timestamptz | |
+| `updated_at` | timestamptz | auto-updated |
+
+### `application_tokens`
+
+Single-use tokens for public application form access.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `flow_id` | uuid FK -> `application_flows.id` | cascade delete |
+| `discord_id` | text | applicant Discord ID |
+| `discord_username` | text | applicant username |
+| `discord_avatar_url` | text nullable | applicant avatar |
+| `token` | text unique | random secure token |
+| `expires_at` | timestamptz | token expiry |
+| `used_at` | timestamptz nullable | null until submitted |
+| `created_at` | timestamptz | |
+
+### `applications`
+
+Individual application submissions tied to a flow.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `flow_id` | uuid FK -> `application_flows.id` | cascade delete |
+| `discord_id` | text | applicant Discord ID |
+| `discord_username` | text | applicant username |
+| `discord_avatar_url` | text nullable | applicant avatar |
+| `answers_json` | jsonb | form answers keyed by node ID |
+| `status` | enum | `pending`, `approved`, `rejected` |
+| `roles_assigned` | jsonb | Discord role IDs assigned on approval |
+| `pending_role_assignments` | jsonb | roles queued for assignment |
+| `display_name_composed` | text nullable | composed display name from answers |
+| `reviewed_by` | uuid nullable FK -> `users.id` | reviewer |
+| `reviewed_at` | timestamptz nullable | |
+| `created_at` | timestamptz | |
+| `updated_at` | timestamptz | auto-updated |
+
+### `application_file_uploads`
+
+File attachments submitted with applications.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `application_id` | uuid nullable FK -> `applications.id` | cascade delete |
+| `discord_id` | text | uploader Discord ID |
+| `flow_id` | uuid FK -> `application_flows.id` | cascade delete |
+| `original_filename` | text | original file name |
+| `mime_type` | text | file MIME type |
+| `storage_path` | text | server file path |
+| `file_size` | integer | size in bytes |
+| `created_at` | timestamptz | |
+
+### `application_moderator_notifications`
+
+Per-flow moderator notification subscriptions.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `flow_id` | uuid FK -> `application_flows.id` | PK part, cascade delete |
+| `user_id` | uuid FK -> `users.id` | PK part, cascade delete |
+| `enabled` | boolean | defaults true |
+
+Composite primary key: `(flow_id, user_id)`.
+
+### `application_access_settings`
+
+Controls moderator access to the application module.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | serial PK | |
+| `allow_moderator_access` | boolean | defaults true |
 | `updated_at` | timestamptz | |
 | `updated_by` | uuid nullable FK -> `users.id` | |
 
@@ -264,4 +387,6 @@ Global community-level settings used by the internal app.
 - a user can hold multiple permission roles
 - selectable Discord roles define the self-service boundary for `/api/profile/discord-roles`
 - user Discord-role snapshots are informational and synchronization-oriented
-- theme, CMS access, and community settings behave as singleton-style configuration tables
+- theme, CMS access, community settings, and application access settings behave as singleton-style configuration tables
+- an application flow has many tokens, applications, file uploads, embeds, and moderator notification subscriptions
+- an application belongs to one flow and may have many file uploads

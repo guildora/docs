@@ -27,24 +27,41 @@
 - `/` redirects to `/dashboard`
 - `/login` is the user-facing Discord login page
 
+### Public Hub Routes (token-gated)
+
+- `/apply/[flowId]/[token]` — public application form (validated via single-use token)
+
 ### Authenticated Hub Routes
 
 - `/dashboard`
 - `/members`
-- `/members/[id]`
+- `/members/[id]` redirects to `/members?member=:id` (opens member details modal)
 - `/profile`
 - `/profile/name`
 - `/profile/roles`
 - `/profile/design`
-- `/profile/[id]` redirects to `/members/[id]`
-- `/marketplace`
-- `/marketplace/submit` redirects to `/marketplace`
-- `/marketplace/[appId]` redirects to `/marketplace`
+- `/profile/[id]` redirects to `/members?member=:id`
+- `/apps` — installed app listing
+- `/apps/explore` — app exploration/marketplace
+- `/apps/overview` — app overview
+- `/apps/sideload` — local app sideloading (admin)
+- `/apps/[appId]/[...slug]` — app-provided pages
 - `/cms`
 
 ### Moderator Hub Routes
 
 - `/mod`
+- `/mod/users` — user moderation view
+- `/applications` — application management dashboard
+- `/applications/open` — open/pending applications list
+- `/applications/open/[applicationId]` — view and review individual application
+- `/applications/archive` — archived applications
+- `/applications/archive/[applicationId]` — view archived application
+- `/applications/flows` — application flow list
+- `/applications/flows/new` — create new application flow
+- `/applications/flows/[flowId]` — visual flow editor (Vue Flow)
+- `/applications/flows/[flowId]/settings` — flow settings
+- `/applications/config` — application module settings (admin)
 
 ### Admin Hub Routes
 
@@ -91,5 +108,6 @@ Merged result is served by `GET /api/apps/navigation` and rendered by the defaul
 ## Notes
 
 - `/cms` is an embedded CMS session bootstrap, not a local editor.
-- `/marketplace` is an iframe host controlled by `NUXT_PUBLIC_MARKETPLACE_EMBED_URL`.
+- `/apps/explore` embeds the marketplace via iframe controlled by `NUXT_PUBLIC_MARKETPLACE_EMBED_URL`.
+- `/apply/:flowId/:token` is the only public hub route — all other hub routes require authentication.
 - landing rendering is separate from hub and stays public.

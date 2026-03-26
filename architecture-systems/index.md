@@ -1,6 +1,6 @@
-# Internals
+# Architecture & Systems
 
-Technical documentation for Guildora platform maintainers.
+Technical platform documentation for Guildora maintainers and contributors.
 
 ## Guildora
 
@@ -12,7 +12,7 @@ Core platform: Hub, Landing, CMS, Bot, shared package.
 
 → [marketplace/](./marketplace/index.md)
 
-Public marketplace app: landing page + developer/admin portal.
+Marketplace service architecture, API contracts, and integration behavior.
 
 ---
 

@@ -52,7 +52,7 @@ See also [`permissions-matrix.md`](./permissions-matrix.md).
 | PUT | `/api/profile` | session | update own structured profile name, appearance, locale, and custom fields |
 | PUT | `/api/profile/locale` | session | atomically update the user's locale preference |
 | PUT | `/api/profile/discord-roles` | session | sync self-service Discord role selection against the admin allowlist |
-| GET | `/api/members` | session | list members with filters, sort, and recent voice summary |
+| GET | `/api/members` | session | list members with filters, sort, voice summary, card role fallback, and avatar URL for member cards |
 | GET | `/api/dashboard/stats` | session | dashboard charts, summaries, and profile-change feed |
 
 ## Apps and Navigation
@@ -92,9 +92,35 @@ These routes are intended for development or explicit debug modes.
 | PUT | `/api/mod/users/:id/profile` | staff | update another user's structured name |
 | PUT | `/api/mod/users/:id/community-role` | staff | set another user's community role |
 | POST | `/api/mod/users/:id/sync` | staff | trigger Discord sync for a user |
-| GET | `/api/mod/applications` | staff | list open community applications |
-| POST | `/api/mod/applications/:id/approve` | staff | approve an application and promote the user |
-| POST | `/api/mod/applications/:id/reject` | staff | reject an application |
+## Application Flows and Submissions
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/applications/flows` | staff | list all application flows |
+| POST | `/api/applications/flows` | staff | create a new application flow |
+| GET | `/api/applications/flows/:flowId` | staff | get flow details with graph and settings |
+| PUT | `/api/applications/flows/:flowId` | staff | update flow graph and settings |
+| DELETE | `/api/applications/flows/:flowId` | staff | delete an application flow |
+| POST | `/api/applications/flows/:flowId/duplicate` | staff | duplicate an existing flow |
+| GET | `/api/applications/open` | staff | list open/pending applications |
+| GET | `/api/applications/:applicationId` | staff | get individual application details |
+| POST | `/api/applications/:applicationId/approve` | staff | approve application and assign roles |
+| POST | `/api/applications/:applicationId/reject` | staff | reject an application |
+| POST | `/api/applications/:applicationId/retry-roles` | staff | retry failed role assignments |
+| GET | `/api/applications/archive` | staff | list archived (completed) applications |
+| POST | `/api/applications/archive/cleanup` | admin | clean up old archived applications |
+| GET | `/api/applications/config` | admin | get application module configuration |
+| PUT | `/api/applications/config` | admin | update application module configuration |
+| GET | `/api/applications/moderator-notifications` | staff | get notification subscriptions for flows |
+| PUT | `/api/applications/moderator-notifications` | staff | update notification subscriptions |
+
+## Public Application Form
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| POST | `/api/apply/:flowId/validate-token` | public | validate a single-use application token |
+| POST | `/api/apply/:flowId/submit` | public | submit completed application form |
+| POST | `/api/apply/:flowId/upload` | public | upload file attachment for application |
 
 ## Admin: Theme, Community, and App Management
 
@@ -105,8 +131,12 @@ These routes are intended for development or explicit debug modes.
 | GET | `/api/admin/users` | admin | list users for admin tooling |
 | GET | `/api/admin/apps` | admin | list installed apps with admin stats |
 | POST | `/api/admin/apps/sideload` | admin | download and store an app manifest from GitHub |
+| POST | `/api/admin/apps/local-sideload` | admin | sideload an app from local file system |
+| GET | `/api/admin/apps/update-check` | admin | check for available app updates |
 | PUT | `/api/admin/apps/:appId/config` | admin | store app configuration JSON |
 | PUT | `/api/admin/apps/:appId/status` | admin | set app status |
+| POST | `/api/admin/apps/:appId/auto-update` | admin | toggle auto-update for an app |
+| POST | `/api/admin/apps/:appId/update` | admin | manually trigger app update |
 | DELETE | `/api/admin/apps/:id` | admin | delete an installed app row |
 | GET | `/api/admin/community-settings` | admin | load community name and default locale |
 | PUT | `/api/admin/community-settings` | admin | update community name and default locale |
@@ -133,8 +163,21 @@ These routes are intended for development or explicit debug modes.
 | DELETE | `/api/admin/users/by-community-role/:communityRoleId` | admin | bulk remove or reconcile users belonging to one community role |
 | POST | `/api/admin/dev/reset-mirror` | admin | reset admin mirror state used by the dev tooling |
 
+## Marketplace Integration
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/marketplace/apps` | session | fetch approved apps from marketplace database |
+
+## Public Endpoints
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/public/branding` | public | public community branding (name, logo) |
+| POST | `/api/feedback` | public | submit user feedback |
+
 ## Notes on Current Product Boundaries
 
-- Marketplace pages in the hub app are currently an iframe shell or redirects, not a local feature-complete marketplace product.
-- The schema still contains `app_marketplace_submissions`, and app-submission checks still exist in utilities, but there is no active local submissions API in hub.
+- The hub app embeds the marketplace UI via iframe at `/apps/explore` using `NUXT_PUBLIC_MARKETPLACE_EMBED_URL`.
+- The schema contains `app_marketplace_submissions` for local submission storage, but the active submission review flow runs in the separate marketplace app.
 - Landing is public and intentionally thin; if OAuth requests hit landing by mistake, the web shim forwards them to hub instead of handling auth locally.
