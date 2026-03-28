@@ -2,7 +2,22 @@
 
 ## Vue Pages
 
-Pages live in `src/pages/` and are standard Vue 3 SFCs.
+Pages live in `src/pages/` and are standard Vue 3 SFCs. Pages support **relative imports** for components, composables, and utilities within the app.
+
+### Relative Imports
+
+Files under `src/components/`, `src/composables/`, and `src/utils/` are automatically included during sideloading. You can import them with standard relative paths:
+
+```vue
+<script setup>
+import MultiSelect from '../components/MultiSelect.vue'
+import { useFilters } from '../composables/useFilters'
+</script>
+```
+
+Supported file types: `.vue`, `.ts`, `.js`, `.json`. TypeScript is transpiled client-side via Babel — complex features (const enums, namespace merging) are not supported.
+
+For files outside auto-discovered directories, add them to `manifest.includes`.
 
 ```vue
 <template>
@@ -40,7 +55,10 @@ const { data, pending, error } = await useFetch('/api/apps/my-app/overview')
 - `useI18n()` — `{ t, locale }` for translations
 - `useAuth()` — `{ user, hasRole, guildId }` for current user
 - `useAppConfig()` — key/value object of all configField values for this guild
-- `useFetch()` — standard Nuxt `useFetch`, scoped to host origin
+- `useFetch()` — simplified fetch wrapper (returns `{ data, pending, error, refresh }`). **Not** the real Nuxt `useFetch` — it is a polyfill with important limitations:
+  - **Only accepts a plain string URL** — do NOT pass a `computed()` or `ref()` as the URL. Reactive URLs are not supported; the object gets coerced to `[object Object]`, causing the fetch to hit a wrong endpoint. For dynamic URLs, use `$fetch()` directly or build the URL string before calling `useFetch()`.
+  - **No reactive refetching** — changing the URL does not trigger a refetch. Call `refresh()` manually or use `$fetch()` for filter/query-dependent requests.
+  - `useAppConfig()` is **not available** inside dynamically loaded app pages. Access config values through your own API endpoint instead.
 
 ### Design System
 

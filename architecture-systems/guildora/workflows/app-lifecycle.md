@@ -36,7 +36,8 @@ Flow:
 6. If bot hooks are declared, `src/bot/hooks.ts` is bundled as a standalone CJS entrypoint (relative imports included).
 7. Manifest pages are fetched as raw SFC source and stored for dynamic page rendering.
 8. Optional app locale bundles (`src/i18n/en.json`, `src/i18n/de.json`) are fetched and stored when present.
-9. The row is inserted or updated in `installed_apps`.
+9. Additional source files under `src/components/`, `src/composables/`, and `src/utils/` are auto-discovered (via GitHub Tree API or filesystem walk) and stored raw in the code bundle, enabling relative imports from Vue page SFCs. The optional `includes` manifest field can declare extra files beyond auto-discovered directories (max 50 files, 2 MB total).
+10. The row is inserted or updated in `installed_apps`.
 10. Status is set based on the `activate` flag.
 11. The in-memory app registry is refreshed.
 
@@ -80,3 +81,5 @@ Current behavior:
 - sideloaded API and bot bundles only support relative imports within the app repository
 - runtime `require(...)` for external packages is not available in sideloaded API and bot execution
 - app pages are loaded dynamically from stored SFC source; locale messages are fetched separately from stored `src/i18n/{locale}.json`
+- Vue page SFCs support relative imports for `.vue`, `.ts`, `.js`, and `.json` files stored in the code bundle; client-side `.ts` is transpiled via Babel (complex TypeScript features like const enums or namespace merging are not supported)
+- auto-discovered includable files are capped at 50 files and 2 MB total raw size

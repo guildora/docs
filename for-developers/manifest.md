@@ -44,6 +44,11 @@ The `manifest.json` file at the repo root is required. It is fetched by the Guil
   // ── Config Fields ─────────────────────────────────────────────────────
   "configFields": [/* see below */],
 
+  // ── Includes (optional) ──────────────────────────────────────────────
+  "includes": [
+    "src/lib/custom-parser.ts"
+  ],
+
   // ── Environment ───────────────────────────────────────────────────────
   "requiredEnv": [
     { "key": "API_SECRET", "description": "Secret for external API" }
@@ -186,6 +191,21 @@ Slash commands registered with Discord when the app is activated:
 // type: select
 { "key": "tier", "type": "select", "label": "Tier", "options": ["a","b","c"], "default": "a" }
 ```
+
+## includes
+
+Optional array of repo-relative file paths to include in the code bundle beyond auto-discovered files. During sideloading, files under `src/components/`, `src/composables/`, and `src/utils/` are automatically collected. Use `includes` for files outside those directories.
+
+```jsonc
+"includes": [
+  "src/lib/custom-parser.ts",
+  "src/data/defaults.json"
+]
+```
+
+- Max 50 entries
+- Supported extensions: `.vue`, `.ts`, `.js`, `.json`
+- Total raw size limit: 2 MB (across all includable files)
 
 ## Common Mistakes
 

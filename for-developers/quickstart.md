@@ -45,6 +45,9 @@ Key constraints:
 ## 3. Add Your Logic
 
 - **`src/pages/*.vue`** — Vue components rendered in the Hub
+- **`src/components/*.vue`** — Reusable Vue components (auto-included, importable from pages)
+- **`src/composables/*.ts`** — Shared composables (auto-included)
+- **`src/utils/*.ts`** — Shared utilities (auto-included)
 - **`src/api/*.ts`** — Nitro API handlers
 - **`src/bot/hooks.ts`** — Bot event handlers
 - **`src/i18n/`** — Translation strings (EN + DE)
