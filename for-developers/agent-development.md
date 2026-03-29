@@ -25,11 +25,11 @@ Keep it repo-specific:
 - links back to the canonical docs above
 - project-specific test or release rules
 
-### Accessing Docs (Claude Code)
+### Accessing Docs
 
 All Guildora documentation is deployed at **https://guildora.github.io/docs** and accessible from any system — no local clone needed.
 
-Claude Code agents can fetch any doc page directly:
+AI coding agents can fetch any doc page directly:
 - `https://guildora.github.io/docs/for-developers/manifest.html` — manifest reference
 - `https://guildora.github.io/docs/for-developers/hub-integration.html` — hub pages + API routes
 - `https://guildora.github.io/docs/DESIGN_SYSTEM.html` — design tokens and component rules
