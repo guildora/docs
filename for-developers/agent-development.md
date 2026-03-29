@@ -133,7 +133,9 @@ This is the most common source of mistakes in AI-generated Guildora app code.
 | Respect spacing grid | Only tokens: `1, 2, 3, 4, 6, 8, 12, 16, 24, 32` — no `*-5` |
 | No Tailwind color utils | `text-primary`, `bg-base-200`, `border-base-300` are **unreliable** |
 | No font classes | DM Sans is injected globally — do not set any font |
-| No imports for composables | `useI18n`, `useAuth`, `useFetch` are globally injected |
+| No imports for composables | `useI18n`, `useAuth`, `useFetch`, `$fetch` are globally injected |
+| `useFetch()` only takes plain strings | Do NOT pass `computed()` or `ref()` as URL — the polyfill coerces objects to `[object Object]`. For dynamic URLs use `$fetch()` directly |
+| `useAppConfig()` is NOT available | Access config values through your own API endpoint instead |
 
 ### Why `.field*` for forms?
 

@@ -2,13 +2,14 @@
 
 ## Monorepo Topology
 
-The repository is a pnpm workspace orchestrated with Turbo. It contains four deployable applications and one shared package:
+The repository is a pnpm workspace orchestrated with Turbo. It contains four deployable applications and two shared packages:
 
 - `apps/web` (public landing)
 - `apps/hub` (internal app + auth + API)
 - `apps/cms` (Payload authoring)
 - `apps/bot` (Discord runtime)
-- `packages/shared`
+- `packages/shared` (schema, types, utilities)
+- `packages/app-sdk` (app extension SDK types)
 
 All services use TypeScript. Hub and bot import shared schema and types from `@guildora/shared`. Web is intentionally thinner and primarily consumes CMS HTTP content plus public runtime config.
 
@@ -50,13 +51,22 @@ All services use TypeScript. Hub and bot import shared schema and types from `@g
   - manifest-based bot hook registration
   - base community-role bootstrapping
 
-### Shared Package
+### Shared Package (`packages/shared`)
 
 - Drizzle schema definitions
 - Postgres client and migrations
 - Zod app-manifest parsing
+- application flow types and linearization
+- application token signing and verification
 - profile-name helpers
 - role and locale types
+
+### App SDK (`packages/app-sdk`)
+
+- TypeScript type definitions for the app extension system
+- bot hook payload interfaces
+- `BotContext` and `HubAppContext` interfaces
+- `BotClient` and `AppDb` interfaces
 
 ## Database Ownership
 
@@ -118,4 +128,4 @@ The repository uses one PostgreSQL instance with two logical areas:
 - Web is a public landing renderer with one OAuth redirect shim, not an internal workflow host.
 - Bot is the source of truth for live guild state and manageable Discord role operations.
 - CMS content remains isolated from internal app-domain tables.
-- Installed app manifests are metadata and navigation extensions today, not a general plugin runtime.
+- Installed apps can contribute navigation, API routes, Vue pages, and bot hooks through their manifest and bundled code.

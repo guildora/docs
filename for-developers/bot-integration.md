@@ -11,7 +11,8 @@ import type {
   VoiceActivityPayload,
   RoleChangePayload,
   MemberJoinPayload,
-  InteractionPayload
+  InteractionPayload,
+  MessagePayload
 } from '@guildora/app-sdk'
 
 export async function onVoiceActivity(payload: VoiceActivityPayload, ctx: BotContext) {
@@ -34,62 +35,93 @@ export async function onInteraction(payload: InteractionPayload, ctx: BotContext
     at: payload.occurredAt
   })
 }
+
+export async function onMessage(payload: MessagePayload, ctx: BotContext) {
+  if (payload.content.startsWith('!hello')) {
+    await ctx.bot.sendMessage(payload.channelId, `Hello, <@${payload.memberId}>!`)
+  }
+}
 ```
 
 ## BotContext
 
 ```typescript
 interface BotContext {
-  guildId: string
-  config: Record<string, any>   // configField values
-  db: AppDb                      // same KV store as in API routes
-  bot: BotClient                 // bot API client
+  config: Record<string, unknown>   // configField values set by admin
+  db: AppDb                          // scoped KV store for this app
+  bot: BotClient                     // Discord bot client
+  botUserId: string                  // the bot's own Discord user ID
 }
 ```
 
 ## BotClient Methods
 
 ```typescript
-ctx.bot.sendMessage(channelId: string, content: string): Promise<void>
-ctx.bot.addRole(memberId: string, roleId: string): Promise<void>
-ctx.bot.removeRole(memberId: string, roleId: string): Promise<void>
-ctx.bot.getMember(memberId: string): Promise<Member>
+interface BotClient {
+  sendMessage(channelId: string, content: string): Promise<void>
+  createVoiceChannel(name: string, parentId: string): Promise<{ id: string; name: string } | null>
+  deleteChannel(channelId: string): Promise<boolean>
+  getChannel(channelId: string): Promise<{ id: string; name: string; parentId: string | null; memberCount: number | null } | null>
+  setChannelName(channelId: string, name: string): Promise<boolean>
+  moveMemberToChannel(memberId: string, channelId: string): Promise<boolean>
+  getMemberVoiceChannelId(memberId: string): Promise<string | null>
+  listVoiceChannelsByCategory(categoryId: string): Promise<Array<{ id: string; name: string; parentId: string | null; memberCount: number | null }>>
+  listTextChannels(): Promise<Array<{ id: string; name: string }>>
+  listAllChannels(): Promise<Array<{ id: string; name: string; type: string; parentId: string | null }>>
+}
 ```
 
 ## Payload Types
 
 ```typescript
 interface VoiceActivityPayload {
+  guildId: string
   memberId: string
   action: 'join' | 'leave' | 'move'
-  channelId: string
-  previousChannelId?: string  // only on 'move'
+  channelId: string | null
+  previousChannelId: string | null
   durationSeconds?: number    // only on 'leave' and 'move'
+  occurredAt: string          // ISO date string
 }
 
 interface RoleChangePayload {
+  guildId: string
   memberId: string
   addedRoles: string[]
   removedRoles: string[]
-  allRoles: string[]
-}
-
-interface MessagePayload {
-  memberId: string
-  channelId: string
-  messageId: string
-  content: string
 }
 
 interface MemberJoinPayload {
+  guildId: string
   memberId: string
-  joinedAt: string  // ISO date string
+  username: string
+  joinedAt: string | null     // ISO date string
 }
 
 interface InteractionPayload {
+  guildId: string | null
   memberId: string
   commandName: string
-  occurredAt: string  // ISO date string
+  channelId: string | null
+  occurredAt: string          // ISO date string
+}
+
+interface MessagePayload {
+  guildId: string
+  channelId: string
+  messageId: string
+  memberId: string
+  content: string
+  occurredAt: string          // ISO date string
+  replyToMessageId?: string   // if this is a reply
+  replyToUserId?: string      // author of the replied-to message
+  attachments?: MessageAttachment[]
+}
+
+interface MessageAttachment {
+  url: string
+  contentType: string
+  filename: string
 }
 ```
 
@@ -121,3 +153,4 @@ export async function onInteraction(payload: InteractionPayload, ctx: BotContext
 | Forgetting `await` on `db.set` | Always `await` async db calls |
 | Accessing `payload.durationSeconds` on 'join' | Only available on 'leave' and 'move' |
 | Missing `onInteraction` export when using `botCommands` | Must be exported and listed in `botHooks` |
+| Using `addRole`/`removeRole` on BotClient | These methods do not exist; use the hub API for role management |

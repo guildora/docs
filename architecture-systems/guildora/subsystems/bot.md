@@ -17,6 +17,7 @@
 - `interactionCreate`
 - `guildMemberAdd`
 - `voiceStateUpdate`
+- `messageCreate`
 
 ## Implemented Bot Features
 
@@ -38,6 +39,13 @@
 - `guildMemberAdd` emits `onMemberJoin`
 - interaction handling emits `onInteraction`
 
+### Message Handling
+
+- `messageCreate` listens for non-bot guild messages
+- extracts message content, channel, author, and image attachments
+- includes reply context (referenced message ID and author)
+- emits `onMessage` hook to installed apps
+
 ### Internal Sync Server
 
 The bot runs an internal HTTP server guarded by `BOT_INTERNAL_TOKEN`. The hub app uses it for:
@@ -51,14 +59,15 @@ The bot runs an internal HTTP server guarded by `BOT_INTERNAL_TOKEN`. The hub ap
 
 ## App Hook System
 
-Active installed apps can declare bot hooks in their manifest. The current implementation registers lightweight logging handlers per active app for:
+Active installed apps can declare bot hooks in their manifest. The bot loads transpiled CJS code bundles from `installed_apps.code_bundle` and executes real hook functions exported by apps. Each app receives a `BotContext` with config, KV store, and bot client access. Hook execution is sandboxed by an error boundary so one app cannot crash the bot runtime.
+
+Supported hooks:
 
 - `onRoleChange`
 - `onMemberJoin`
 - `onVoiceActivity`
 - `onInteraction`
-
-This is a manifest-driven extension seam, not a full plugin runtime.
+- `onMessage`
 
 ## Important Constraints
 

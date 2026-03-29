@@ -26,7 +26,7 @@ The hub is the operational center for members, moderation, admin tooling, and in
 - public login CTA that sends users into the hub login flow
 - Discord OAuth login into the internal hub
 - member profile editing with structured display-name handling
-- community applications review and promotion from `Bewerber` to higher community roles
+- visual flow-based community applications with token-gated public forms, moderator review, and automated Discord role assignment on approval
 - member directory search and voice-activity overview
 - self-service Discord role assignment from an admin-curated allowlist
 - admin synchronization between Discord guild membership and the internal database
@@ -42,6 +42,7 @@ Included in this repository:
 - CMS authoring and publishing (`apps/cms`)
 - Discord bot runtime and internal sync bridge (`apps/bot`)
 - shared PostgreSQL schema and cross-service types (`packages/shared`)
+- app extension SDK types (`packages/app-sdk`)
 
 Current product boundaries:
 
@@ -55,7 +56,8 @@ Current product boundaries:
 
 - `permission roles`: technical access roles stored in `permission_roles` and carried in sessions as `permissionRoles`
 - `community roles`: domain roles such as `Bewerber`, `Anwaerter`, `Mitglied`, mapped to one permission role
-- `applications`: community membership applications handled in moderation
+- `application flows`: visual node-based application form definitions managed by staff
+- `applications`: individual submitted applications tied to a flow
 - `submissions`: marketplace app submissions; table exists but local review flow is not active
 - `installed apps`: app manifests stored in `installed_apps`, used for internal navigation and bot hook registration
 - `CMS SSO`: short-lived handoff from hub to Payload admin via signed token
@@ -70,6 +72,7 @@ apps/
   bot/       Discord bot and internal sync server
 packages/
   shared/    Drizzle schema, DB client, shared types and helpers
+  app-sdk/   App extension SDK types for bot hooks and contexts
 docs/        Canonical project documentation
 ai/          AI-oriented skill and manifest layer
 ```

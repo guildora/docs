@@ -185,6 +185,8 @@ Stored app manifests currently known to the platform.
 | `repository_url` | text nullable | source repository |
 | `manifest` | jsonb | parsed against app-manifest schema |
 | `config` | jsonb | app configuration blob |
+| `code_bundle` | jsonb | `Record<string,string>` mapping file paths to transpiled CJS source; not null, defaults `{}` |
+| `auto_update` | boolean | automatically update when new versions are available; not null, defaults false |
 | `created_by` | uuid nullable FK -> `users.id` | |
 | `installed_at` | timestamptz | |
 | `updated_at` | timestamptz | auto-updated |
@@ -259,6 +261,14 @@ Controls whether moderators can use embedded CMS access.
 | `id` | serial PK | |
 | `allow_moderator_access` | boolean | defaults true |
 | `allow_moderator_apps_access` | boolean | defaults true; controls moderator access to apps module |
+| `mod_delete_users` | boolean | defaults false; allow moderators to delete users |
+| `mod_manage_applications` | boolean | defaults false; allow moderators to manage applications |
+| `mod_access_community_settings` | boolean | defaults false; allow moderators to access community settings |
+| `mod_access_design` | boolean | defaults false; allow moderators to access design settings |
+| `mod_access_apps` | boolean | defaults false; allow moderators to access app management |
+| `mod_access_discord_roles` | boolean | defaults false; allow moderators to access Discord role settings |
+| `mod_access_custom_fields` | boolean | defaults false; allow moderators to access custom field settings |
+| `mod_access_permissions` | boolean | defaults false; allow moderators to access permission settings |
 | `updated_at` | timestamptz | |
 | `updated_by` | uuid nullable FK -> `users.id` | |
 
@@ -272,6 +282,7 @@ Global community-level settings used by the internal app.
 | `community_name` | text nullable | internal sidebar branding |
 | `discord_invite_code` | text nullable | Discord server invite code |
 | `default_locale` | text | `en` or `de` |
+| `display_name_template` | jsonb | `DisplayNameField[]` array defining which fields compose the display name; defaults `[]` |
 | `updated_at` | timestamptz | |
 | `updated_by` | uuid nullable FK -> `users.id` | |
 
@@ -285,6 +296,7 @@ Visual node-based application form definitions (Vue Flow).
 | `name` | text | flow display name |
 | `status` | enum | `draft`, `active`, `inactive` |
 | `flow_json` | jsonb | Vue Flow graph definition (`ApplicationFlowGraph`) |
+| `draft_flow_json` | jsonb nullable | work-in-progress draft of the flow graph |
 | `settings_json` | jsonb | flow settings (`ApplicationFlowSettings`) |
 | `created_by` | uuid nullable FK -> `users.id` | creator |
 | `created_at` | timestamptz | |
@@ -369,6 +381,43 @@ Per-flow moderator notification subscriptions.
 
 Composite primary key: `(flow_id, user_id)`.
 
+### `community_custom_fields`
+
+Admin-managed custom profile field definitions.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `key` | text unique | not null; field identifier |
+| `label` | text | not null; display label |
+| `description` | text nullable | help text |
+| `input_type` | text | not null; field type (text, number, select, slider, etc.) |
+| `options` | jsonb nullable | `string[]` for select-type fields |
+| `slider_min` | integer nullable | minimum value for slider fields |
+| `slider_max` | integer nullable | maximum value for slider fields |
+| `slider_step` | integer nullable | step increment for slider fields |
+| `required` | boolean | defaults false |
+| `active` | boolean | defaults true |
+| `is_default` | boolean | defaults false; system-provided default fields |
+| `user_can_view` | boolean | defaults false; whether users can see this field on profiles |
+| `user_can_edit` | boolean | defaults false; whether users can edit their own value |
+| `mod_can_view` | boolean | defaults false; whether moderators can see this field |
+| `mod_can_edit` | boolean | defaults false; whether moderators can edit this field |
+| `sort_order` | integer | not null, defaults 0 |
+| `created_at` | timestamptz | |
+| `updated_at` | timestamptz | auto-updated |
+
+### `community_tags`
+
+Moderator-managed labels for community members.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `name` | text unique | not null |
+| `created_at` | timestamptz | |
+| `created_by` | uuid nullable FK -> `users.id` | moderator who created the tag |
+
 ### `application_access_settings`
 
 Controls moderator access to the application module.
@@ -388,5 +437,7 @@ Controls moderator access to the application module.
 - selectable Discord roles define the self-service boundary for `/api/profile/discord-roles`
 - user Discord-role snapshots are informational and synchronization-oriented
 - theme, CMS access, community settings, and application access settings behave as singleton-style configuration tables
+- community custom fields define the field schema; per-user values are stored in `profiles.custom_fields`
+- community tags are moderator-managed labels distinct from Discord roles
 - an application flow has many tokens, applications, file uploads, embeds, and moderator notification subscriptions
 - an application belongs to one flow and may have many file uploads

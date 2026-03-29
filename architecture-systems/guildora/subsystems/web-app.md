@@ -40,8 +40,7 @@
 - language changes persist before UI locale switch
 - self-assignable Discord roles are limited to the admin allowlist
 - moderator access to `/cms` depends on `cms_access_settings`
-- some admin and marketplace pages are intentional redirects
-- `/marketplace` renders an iframe only when `NUXT_PUBLIC_MARKETPLACE_EMBED_URL` is configured
+- settings pages use the `settings` middleware which allows admins and moderators with moderation rights
 
 ## Note
 

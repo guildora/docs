@@ -7,7 +7,7 @@ Read this first when working anywhere in the Guildora platform.
 
 ## Repositories
 
-- `guildora/` — core platform: Hub, Landing, CMS, Bot, shared DB
+- `guildora/` — core platform: Hub, Landing, CMS, Bot, shared DB, app-sdk
 - `marketplace/` — private marketplace service and developer/admin portal
 - `apps/guildora-app-template/` — starter repo for Guildora apps
 - `docs/` — centralized documentation

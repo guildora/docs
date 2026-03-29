@@ -48,12 +48,22 @@ See also [`permissions-matrix.md`](./permissions-matrix.md).
 
 | Method | Path | Auth | Purpose |
 | --- | --- | --- | --- |
-| GET | `/api/profile` | session; foreign lookup is staff-only | load current profile or a specific user profile with `?id=` |
+| GET | `/api/profile` | session | load current user profile |
 | PUT | `/api/profile` | session | update own structured profile name, appearance, locale, and custom fields |
 | PUT | `/api/profile/locale` | session | atomically update the user's locale preference |
+| PUT | `/api/profile/avatar` | session | upload a new avatar image |
+| DELETE | `/api/profile/avatar` | session | remove the current avatar |
+| GET | `/api/profile/custom-fields` | session | load own custom field values |
+| PUT | `/api/profile/custom-fields` | session | update own custom field values |
 | PUT | `/api/profile/discord-roles` | session | sync self-service Discord role selection against the admin allowlist |
 | GET | `/api/members` | session | list members with filters, sort, voice summary, card role fallback, and avatar URL for member cards |
 | GET | `/api/dashboard/stats` | session | dashboard charts, summaries, and profile-change feed |
+
+## Community Settings
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/community-settings/display-name-template` | session | get the display name template fields configured for this community |
 
 ## Apps and Navigation
 
@@ -61,6 +71,9 @@ See also [`permissions-matrix.md`](./permissions-matrix.md).
 | --- | --- | --- | --- |
 | GET | `/api/apps` | session | list installed apps visible to the current user context |
 | GET | `/api/apps/navigation` | session | return merged core and app-provided sidebar navigation |
+| GET | `/api/apps/:appId/_messages` | session | get app locale messages for dynamic page rendering |
+| GET | `/api/apps/:appId/_source` | session | get app source code bundle |
+| GET | `/api/apps/:appId/_page-source` | session | get app page SFC source |
 | POST | `/api/apps/:appId/activate` | admin | set installed app status to `active` |
 | POST | `/api/apps/:appId/deactivate` | admin | set installed app status to `inactive` |
 
@@ -91,7 +104,15 @@ These routes are intended for development or explicit debug modes.
 | GET | `/api/mod/users` | staff | list users for moderation |
 | PUT | `/api/mod/users/:id/profile` | staff | update another user's structured name |
 | PUT | `/api/mod/users/:id/community-role` | staff | set another user's community role |
+| GET | `/api/mod/users/:id/custom-fields` | staff | get a user's custom field values |
+| PUT | `/api/mod/users/:id/custom-fields` | staff | update a user's custom field values |
 | POST | `/api/mod/users/:id/sync` | staff | trigger Discord sync for a user |
+| POST | `/api/mod/users/batch-community-role` | staff | batch assign a community role to multiple users |
+| POST | `/api/mod/users/batch-discord-roles` | staff | batch add or remove Discord roles for multiple users |
+| GET | `/api/mod/tags` | staff | list community tags |
+| POST | `/api/mod/tags` | staff | create a community tag |
+| GET | `/api/mod/discord-roles` | staff | list Discord guild roles for bulk operations |
+
 ## Application Flows and Submissions
 
 | Method | Path | Auth | Purpose |
@@ -146,6 +167,19 @@ These routes are intended for development or explicit debug modes.
 | PUT | `/api/admin/community-roles/:id` | admin | update a mapped community role |
 | DELETE | `/api/admin/community-roles/:id` | admin | delete a mapped community role |
 
+## Admin: Custom Fields, Tags, and Moderation Rights
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/admin/custom-fields` | admin | list all custom profile fields |
+| POST | `/api/admin/custom-fields` | admin | create a custom profile field |
+| PUT | `/api/admin/custom-fields/:id` | admin | update a custom profile field |
+| DELETE | `/api/admin/custom-fields/:id` | admin | delete a custom profile field |
+| GET | `/api/admin/moderation-rights` | admin | get granular moderation rights settings |
+| PUT | `/api/admin/moderation-rights` | admin | update granular moderation rights settings |
+| DELETE | `/api/admin/tags/:id` | admin | delete a community tag |
+| POST | `/api/admin/users/batch-delete` | admin | batch delete multiple users |
+
 ## Admin: Discord Role and Mirror Operations
 
 | Method | Path | Auth | Purpose |
@@ -163,21 +197,23 @@ These routes are intended for development or explicit debug modes.
 | DELETE | `/api/admin/users/by-community-role/:communityRoleId` | admin | bulk remove or reconcile users belonging to one community role |
 | POST | `/api/admin/dev/reset-mirror` | admin | reset admin mirror state used by the dev tooling |
 
-## Marketplace Integration
+## Settings: File Storage
 
 | Method | Path | Auth | Purpose |
 | --- | --- | --- | --- |
-| GET | `/api/marketplace/apps` | session | fetch approved apps from marketplace database |
+| GET | `/api/settings/files` | admin | list file storage settings and bucket contents |
+| DELETE | `/api/settings/files/:key` | admin | delete a stored file |
+| DELETE | `/api/settings/files/bucket` | admin | delete entire storage bucket |
+| POST | `/api/settings/files/migrate` | admin | migrate file storage between providers |
+| POST | `/api/settings/files/test-connection` | admin | test storage connection settings |
 
 ## Public Endpoints
 
 | Method | Path | Auth | Purpose |
 | --- | --- | --- | --- |
 | GET | `/api/public/branding` | public | public community branding (name, logo) |
-| POST | `/api/feedback` | public | submit user feedback |
 
 ## Notes on Current Product Boundaries
 
-- The hub app embeds the marketplace UI via iframe at `/apps/explore` using `NUXT_PUBLIC_MARKETPLACE_EMBED_URL`.
 - The schema contains `app_marketplace_submissions` for local submission storage, but the active submission review flow runs in the separate marketplace app.
 - Landing is public and intentionally thin; if OAuth requests hit landing by mistake, the web shim forwards them to hub instead of handling auth locally.

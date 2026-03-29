@@ -23,15 +23,12 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | hub | `/members` | `auth` | session |
 | hub | `/members/:id` | `auth` | session |
 | hub | `/profile` | `auth` | session |
-| hub | `/profile/name` | `auth` | session |
-| hub | `/profile/roles` | `auth` | session |
-| hub | `/profile/design` | `auth` | session |
-| hub | `/profile/:id` | `auth` | session, then redirect |
-| hub | `/apps` | `auth` | session |
-| hub | `/apps/explore` | `auth` | session |
-| hub | `/apps/overview` | `auth` | session |
-| hub | `/apps/sideload` | `admin` | admin, superadmin |
-| hub | `/apps/:appId/:slug` | `auth` | session |
+| hub | `/profile/customize` | `auth` | session |
+| hub | `/profile/:id` | `auth` | session |
+| hub | `/apps` | `moderator` | moderator, admin, superadmin |
+| hub | `/apps/overview` | `moderator` | moderator, admin, superadmin |
+| hub | `/apps/sideload` | `superadmin` | superadmin |
+| hub | `/apps/:appId/:slug` | none (ssr: false) | session (app-level auth) |
 | hub | `/applications` | `moderator` | moderator, admin, superadmin |
 | hub | `/applications/config` | `admin` | admin, superadmin |
 | hub | `/applications/flows` | `moderator` | moderator, admin, superadmin |
@@ -42,18 +39,21 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | hub | `/applications/open/:applicationId` | `moderator` | moderator, admin, superadmin |
 | hub | `/applications/archive` | `moderator` | moderator, admin, superadmin |
 | hub | `/applications/archive/:applicationId` | `moderator` | moderator, admin, superadmin |
-| hub | `/apply/:flowId/:token` | none | public (token-validated) |
+| hub | `/apply/:flowId/:token` | none; `apply` layout | public (token-validated) |
 | hub | `/cms` | `auth` | session at page level; real CMS access enforced by API |
-| hub | `/mod` | `moderator` | moderator, admin, superadmin |
-| hub | `/admin` | `admin` | admin, superadmin |
-| hub | `/admin/design` | `admin` | admin, superadmin |
-| hub | `/admin/theme` | `admin` | admin, superadmin |
-| hub | `/admin/permissions` | `admin` | admin, superadmin |
-| hub | `/admin/discord-roles` | `admin` | admin, superadmin |
-| hub | `/admin/apps` | `admin` | admin, superadmin |
-| hub | `/admin/apps/review` | none | public redirect to `/admin/apps` |
-| hub | `/admin/dev-role-switcher` | `admin` | admin, superadmin |
-| hub | `/admin/users` | `admin` | admin, superadmin |
+| hub | `/settings` | `settings` | admin, superadmin, or moderator with moderation rights |
+| hub | `/settings/design` | `settings` | admin, superadmin, or moderator with moderation rights |
+| hub | `/settings/permissions` | `settings` | admin, superadmin, or moderator with moderation rights |
+| hub | `/settings/community` | `settings` | admin, superadmin, or moderator with moderation rights |
+| hub | `/settings/custom-fields` | `settings` | admin, superadmin, or moderator with moderation rights |
+| hub | `/settings/files` | `settings` | admin, superadmin, or moderator with moderation rights |
+| hub | `/settings/moderation-rights` | `settings` | admin, superadmin, or moderator with moderation rights |
+| hub | `/settings/apps` | `settings` | admin, superadmin, or moderator with moderation rights |
+| hub | `/settings/apps/review` | none (redirect) | admin, superadmin |
+| hub | `/settings/dev-role-switcher` | `settings` | admin, superadmin, or moderator with moderation rights |
+| hub | `/dev` | `dev` | development-only |
+| hub | `/dev/reset` | `dev` | development-only |
+| hub | `/dev/role-switcher` | `dev` | development-only |
 
 ## Nitro Routes
 
@@ -67,14 +67,22 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/theme` | GET | public |
 | `/api/internal/locale-context` | GET | public |
 | `/api/internal/branding` | GET | session |
-| `/api/profile` | GET | session; foreign profile lookup is staff-only |
+| `/api/profile` | GET | session |
 | `/api/profile` | PUT | session |
 | `/api/profile/locale` | PUT | session |
+| `/api/profile/avatar` | PUT | session |
+| `/api/profile/avatar` | DELETE | session |
+| `/api/profile/custom-fields` | GET | session |
+| `/api/profile/custom-fields` | PUT | session |
 | `/api/profile/discord-roles` | PUT | session |
+| `/api/community-settings/display-name-template` | GET | session |
 | `/api/members` | GET | session |
 | `/api/dashboard/stats` | GET | session |
 | `/api/apps` | GET | session |
 | `/api/apps/navigation` | GET | session |
+| `/api/apps/:appId/_messages` | GET | session |
+| `/api/apps/:appId/_source` | GET | session |
+| `/api/apps/:appId/_page-source` | GET | session |
 | `/api/apps/:appId/activate` | POST | admin, superadmin |
 | `/api/apps/:appId/deactivate` | POST | admin, superadmin |
 | `/api/dev/users` | GET | staff in debug or switched flow |
@@ -88,7 +96,14 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/mod/users` | GET | moderator, admin, superadmin |
 | `/api/mod/users/:id/profile` | PUT | moderator, admin, superadmin |
 | `/api/mod/users/:id/community-role` | PUT | moderator, admin, superadmin |
+| `/api/mod/users/:id/custom-fields` | GET | moderator, admin, superadmin |
+| `/api/mod/users/:id/custom-fields` | PUT | moderator, admin, superadmin |
 | `/api/mod/users/:id/sync` | POST | moderator, admin, superadmin |
+| `/api/mod/users/batch-community-role` | POST | moderator, admin, superadmin |
+| `/api/mod/users/batch-discord-roles` | POST | moderator, admin, superadmin |
+| `/api/mod/tags` | GET | moderator, admin, superadmin |
+| `/api/mod/tags` | POST | moderator, admin, superadmin |
+| `/api/mod/discord-roles` | GET | moderator, admin, superadmin |
 | `/api/applications/open` | GET | moderator, admin, superadmin |
 | `/api/applications/:applicationId` | GET | moderator, admin, superadmin |
 | `/api/applications/:applicationId/approve` | POST | moderator, admin, superadmin |
@@ -97,7 +112,6 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/applications/archive` | GET | moderator, admin, superadmin |
 | `/api/applications/archive/cleanup` | POST | admin, superadmin |
 | `/api/applications/config` | GET | admin, superadmin |
-| `/api/applications/config` | PUT | admin, superadmin |
 | `/api/applications/moderator-notifications` | GET | moderator, admin, superadmin |
 | `/api/applications/moderator-notifications` | PUT | moderator, admin, superadmin |
 | `/api/applications/flows` | GET | moderator, admin, superadmin |
@@ -109,11 +123,10 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/apply/:flowId/validate-token` | POST | public (token-based) |
 | `/api/apply/:flowId/submit` | POST | public (token-based) |
 | `/api/apply/:flowId/upload` | POST | public (token-based) |
-| `/api/marketplace/apps` | GET | session |
-| `/api/feedback` | POST | public |
 | `/api/admin/theme` | GET | admin, superadmin |
 | `/api/admin/theme` | PUT | admin, superadmin |
 | `/api/admin/users` | GET | admin, superadmin |
+| `/api/admin/users/batch-delete` | POST | admin, superadmin |
 | `/api/admin/apps` | GET | admin, superadmin |
 | `/api/admin/apps/sideload` | POST | admin, superadmin |
 | `/api/admin/apps/local-sideload` | POST | admin, superadmin |
@@ -130,6 +143,13 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/admin/community-roles` | POST | admin, superadmin |
 | `/api/admin/community-roles/:id` | PUT | admin, superadmin |
 | `/api/admin/community-roles/:id` | DELETE | admin, superadmin |
+| `/api/admin/custom-fields` | GET | admin, superadmin |
+| `/api/admin/custom-fields` | POST | admin, superadmin |
+| `/api/admin/custom-fields/:id` | PUT | admin, superadmin |
+| `/api/admin/custom-fields/:id` | DELETE | admin, superadmin |
+| `/api/admin/moderation-rights` | GET | admin, superadmin |
+| `/api/admin/moderation-rights` | PUT | admin, superadmin |
+| `/api/admin/tags/:id` | DELETE | admin, superadmin |
 | `/api/admin/discord-roles` | GET | admin, superadmin |
 | `/api/admin/discord-roles` | PUT | admin, superadmin |
 | `/api/admin/discord-roles/self-import` | POST | superadmin only |
@@ -142,6 +162,12 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/admin/users/:id` | DELETE | admin, superadmin |
 | `/api/admin/users/by-community-role/:communityRoleId` | DELETE | admin, superadmin |
 | `/api/admin/dev/reset-mirror` | POST | admin, superadmin |
+| `/api/settings/files` | GET | admin, superadmin |
+| `/api/settings/files/:key` | DELETE | admin, superadmin |
+| `/api/settings/files/bucket` | DELETE | admin, superadmin |
+| `/api/settings/files/migrate` | POST | admin, superadmin |
+| `/api/settings/files/test-connection` | POST | admin, superadmin |
+| `/api/public/branding` | GET | public |
 
 ### Web Compatibility API
 
@@ -155,3 +181,5 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 - `requireSession` allows any logged-in role, including `temporaer`.
 - Session payload should read `permissionRoles` first and `roles` only as compatibility fallback.
 - Landing does not own real auth; its `/api/auth/discord` route is only a forwarding shim.
+- The `settings` middleware allows admins and superadmins directly, plus moderators who have at least one moderation right enabled in `cms_access_settings`.
+- `/apply/:flowId/:token` is public but token-validated; it uses the `apply` layout, not the default authenticated layout.

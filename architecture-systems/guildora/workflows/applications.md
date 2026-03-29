@@ -1,56 +1,143 @@
 # Workflow: Community Applications
 
-This workflow covers membership applications handled in the moderator area. It is distinct from marketplace app submissions.
+This workflow covers flow-based membership applications. It is distinct from marketplace app submissions.
 
-## Relevant Data
+## Data Model
 
-- `user_community_roles`
-- `community_roles`
-- `user_permission_roles`
-- `profiles.custom_fields.applicationStatus`
-- `profiles.custom_fields.applicationReviewedAt`
-- `profiles.custom_fields.applicationReviewedBy`
-- `profile_change_log`
+- `application_flows` — visual node-based flow definitions (Vue Flow)
+- `applications` — individual submitted applications
+- `application_tokens` — single-use tokens for public form access
+- `application_file_uploads` — file attachments submitted with applications
+- `application_flow_embeds` — Discord message embeds posted by the bot
+- `application_moderator_notifications` — per-flow notification subscriptions
+- `application_access_settings` — controls moderator access to the applications module
 
-## What Counts as an Open Application
+## Flow Lifecycle
 
-The current code treats a user as an active applicant when both are true:
+Each application flow has a status: `draft`, `active`, or `inactive`.
 
-1. their community role is `Bewerber`
-2. `applicationStatus` is `open` or missing
+- Staff creates a flow with a visual node graph in the Vue Flow editor at `/applications/flows/new`.
+- The graph (`flow_json`) defines the applicant's journey: start → input nodes → info nodes → conditional branches → role assignment → end (or abort).
+- Flows can optionally store a `draft_flow_json` for work-in-progress edits before publishing.
+- Flow settings (`settings_json`) configure embed appearance, role assignments on submission/approval, welcome messages, concurrency rules, token expiry, DM templates, test mode, and archive retention.
+- Only `active` flows can accept new applications.
 
-The applications list is returned by `GET /api/mod/applications`.
+### Node Types
 
-## Approval Flow
+- `start` / `end` — entry and exit points
+- `input` — collects a form field (short text, long text, number, email, select, multi-select, yes/no, date, file upload, Discord username)
+- `info` — displays informational markdown with optional CTA links
+- `conditional_branch` — branches the flow based on a previous input's answer
+- `abort` — terminates the flow with a message (e.g. ineligible applicant)
+- `role_assignment` — specifies Discord roles to assign when traversed
+- `step_group` — groups input nodes visually into a step
 
-1. A moderator or admin posts to `/api/mod/applications/:id/approve`.
-2. The target user must currently be in the `Bewerber` community role.
-3. The target community role defaults to `Anwaerter` unless another allowed target is provided.
-4. The code rejects approving into `Bewerber`.
-5. Community-role assignment is updated.
-6. Technical permission roles are synchronized.
-7. Profile custom fields are updated to `applicationStatus = approved`.
-8. A profile change-log row is written.
-9. The Discord sync bridge is triggered.
+## Application Process
 
-## Rejection Flow
+### 1. Embed Posting
 
-1. A moderator or admin posts to `/api/mod/applications/:id/reject`.
-2. The target user must currently be in the `Bewerber` community role.
-3. The flow sets `applicationStatus = rejected`.
-4. The user remains in the applicant role unless another action changes them later.
-5. A profile change-log row is written.
-6. Permission roles are synchronized.
-7. The Discord sync bridge is triggered.
+When a flow is activated, staff can post an embed to a Discord channel. The bot creates a message with an "Apply" button.
+
+### 2. Token Generation (Bot)
+
+When a Discord user clicks the embed button:
+
+1. The bot loads the flow and verifies it is `active`.
+2. If test mode is off: checks guild membership and whether the user already has approval roles.
+3. Concurrency settings are enforced: `allowReapplyToSameFlow` and `allowCrossFlowApplications`.
+4. A single-use `application_token` is generated with HMAC-SHA256 signing and a configurable expiry (default 60 minutes).
+5. The bot replies with an ephemeral message containing a link to the public form.
+
+### 3. Public Form
+
+The applicant visits `/apply/:flowId/:token` in the hub.
+
+1. Token validation: `POST /api/apply/:flowId/validate-token` verifies signature, expiry, and that the token has not been used.
+2. The flow graph is linearized into sequential steps for rendering.
+3. The applicant fills out form fields and optionally uploads files via `POST /api/apply/:flowId/upload`.
+4. On submit: `POST /api/apply/:flowId/submit` stores the application with status `pending`, marks the token as used, assigns submission roles if configured, sends a welcome message if configured, and notifies subscribed moderators.
+
+### 4. Review
+
+Moderators access applications through the hub UI:
+
+- `GET /api/applications/open` — list pending applications
+- `GET /api/applications/:applicationId` — view individual application details
+
+### 5. Approval
+
+`POST /api/applications/:applicationId/approve`
+
+1. Assigns configured Discord roles (from flow settings `roles.onApproval` plus roles collected from `role_assignment` nodes in the traversed path).
+2. Composes a display name from flow answers if a display name template is configured.
+3. Updates application status to `approved`.
+4. Sends an approval DM to the applicant if configured.
+
+### 6. Rejection
+
+`POST /api/applications/:applicationId/reject`
+
+1. Updates application status to `rejected`.
+2. Sends a rejection DM to the applicant if configured.
+
+### 7. Retry Role Assignments
+
+`POST /api/applications/:applicationId/retry-roles` — retries failed Discord role assignments for an approved application.
+
+## Archive
+
+- `GET /api/applications/archive` — list completed (approved/rejected) applications
+- `POST /api/applications/archive/cleanup` — delete archived applications older than the configured retention period
+
+## Flow Management
+
+- `GET /api/applications/flows` — list all flows
+- `POST /api/applications/flows` — create a new flow
+- `GET /api/applications/flows/:flowId` — get flow details
+- `PUT /api/applications/flows/:flowId` — update flow graph and settings
+- `DELETE /api/applications/flows/:flowId` — delete a flow
+- `POST /api/applications/flows/:flowId/duplicate` — duplicate an existing flow
+
+## Configuration
+
+- `GET /api/applications/config` — get application module configuration
+
+## Moderator Notifications
+
+- `GET /api/applications/moderator-notifications` — get notification subscriptions
+- `PUT /api/applications/moderator-notifications` — update notification subscriptions
+
+## Access Control
+
+`application_access_settings.allow_moderator_access` controls whether moderators can access the applications module. Admins and superadmins always have access.
 
 ## Important Constraints
 
-- an already rejected application cannot be rejected again
-- approving a previously rejected application is blocked by the current handler logic
-- the workflow is tightly coupled to the seeded role names `Bewerber` and `Anwaerter`
+- tokens are single-use and time-limited
+- file uploads are scoped to a flow and linked to an application on submission
+- concurrency enforcement prevents duplicate applications based on flow settings
+- the flow graph is linearized at render time using conditional branching logic
+- role assignment nodes collect Discord role IDs during graph traversal; these are assigned on approval
+- embed posting, token generation, and ephemeral replies are handled by the bot, not the hub
 
 ## Related Routes
 
-- `GET /api/mod/applications`
-- `POST /api/mod/applications/:id/approve`
-- `POST /api/mod/applications/:id/reject`
+- `POST /api/apply/:flowId/validate-token` — public (token-based)
+- `POST /api/apply/:flowId/submit` — public (token-based)
+- `POST /api/apply/:flowId/upload` — public (token-based)
+- `GET /api/applications/flows` — staff
+- `POST /api/applications/flows` — staff
+- `GET /api/applications/flows/:flowId` — staff
+- `PUT /api/applications/flows/:flowId` — staff
+- `DELETE /api/applications/flows/:flowId` — staff
+- `POST /api/applications/flows/:flowId/duplicate` — staff
+- `GET /api/applications/open` — staff
+- `GET /api/applications/:applicationId` — staff
+- `POST /api/applications/:applicationId/approve` — staff
+- `POST /api/applications/:applicationId/reject` — staff
+- `POST /api/applications/:applicationId/retry-roles` — staff
+- `GET /api/applications/archive` — staff
+- `POST /api/applications/archive/cleanup` — admin
+- `GET /api/applications/config` — admin
+- `GET /api/applications/moderator-notifications` — staff
+- `PUT /api/applications/moderator-notifications` — staff

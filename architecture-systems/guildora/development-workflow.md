@@ -13,6 +13,7 @@
 - `pnpm build`
 - `pnpm lint`
 - `pnpm typecheck`
+- `pnpm format`
 - `pnpm db:generate`
 - `pnpm db:migrate`
 - `pnpm db:seed`
@@ -52,6 +53,8 @@ App-specific scripts:
 - `users.displayName` is a serialized composite field
 - canonical delimiter: ` | `
 - use `serializeProfileName`, `parseProfileName`, `coerceProfileNameFromRaw`
+- display name rendering can be customized via `display_name_template` in `community_settings`, which defines which fields to show and in what order
+- when a template is configured, use `serializeFromTemplate`, `parseWithTemplate`, and `validateWithTemplate`
 
 ### UI
 

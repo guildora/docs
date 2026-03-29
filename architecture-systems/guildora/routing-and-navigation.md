@@ -29,7 +29,7 @@
 
 ### Public Hub Routes (token-gated)
 
-- `/apply/[flowId]/[token]` — public application form (validated via single-use token)
+- `/apply/[flowId]/[token]` — public application form (validated via single-use token, uses `apply` layout)
 
 ### Authenticated Hub Routes
 
@@ -37,21 +37,15 @@
 - `/members`
 - `/members/[id]` redirects to `/members?member=:id` (opens member details modal)
 - `/profile`
-- `/profile/name`
-- `/profile/roles`
-- `/profile/design`
+- `/profile/customize` — profile customization (appearance, locale)
 - `/profile/[id]` redirects to `/members?member=:id`
-- `/apps` — installed app listing
-- `/apps/explore` — app exploration/marketplace
-- `/apps/overview` — app overview
-- `/apps/sideload` — local app sideloading (admin)
-- `/apps/[appId]/[...slug]` — app-provided pages
-- `/cms`
+- `/apps/[appId]/[...slug]` — app-provided pages (ssr disabled)
+- `/cms` — embedded CMS session bootstrap
 
 ### Moderator Hub Routes
 
-- `/mod`
-- `/mod/users` — user moderation view
+- `/apps` — installed app listing
+- `/apps/overview` — app overview dashboard
 - `/applications` — application management dashboard
 - `/applications/open` — open/pending applications list
 - `/applications/open/[applicationId]` — view and review individual application
@@ -61,23 +55,37 @@
 - `/applications/flows/new` — create new application flow
 - `/applications/flows/[flowId]` — visual flow editor (Vue Flow)
 - `/applications/flows/[flowId]/settings` — flow settings
-- `/applications/config` — application module settings (admin)
 
-### Admin Hub Routes
+### Admin Hub Routes (via Settings)
 
-- `/admin`
-- `/admin/design`
-- `/admin/theme` redirects to `/admin/design`
-- `/admin/permissions`
-- `/admin/discord-roles`
-- `/admin/apps`
-- `/admin/apps/review` redirects to `/admin/apps`
-- `/admin/dev-role-switcher`
-- `/admin/users` redirects to `/admin/dev-role-switcher`
+All settings routes use the `settings` middleware, which allows admins, superadmins, and moderators with at least one moderation right.
+
+- `/settings` — settings index
+- `/settings/design` — theme and design settings
+- `/settings/permissions` — permission roles and community role management
+- `/settings/community` — community name, locale, display name template
+- `/settings/custom-fields` — custom profile field management
+- `/settings/files` — file storage management
+- `/settings/moderation-rights` — granular moderation rights configuration
+- `/settings/apps` — app management
+- `/settings/apps/review` — app submission review (redirect)
+- `/settings/dev-role-switcher` — development role switcher
+
+### Special Admin Routes
+
+- `/apps/sideload` — local app sideloading (superadmin only)
+- `/applications/config` — application module settings (admin only)
+
+### Development Routes
+
+- `/dev` — development dashboard
+- `/dev/reset` — reset tools
+- `/dev/role-switcher` — switch roles for testing
 
 ## Hub Layouts
 
 - `auth`: public login shell with top navigation/footer
+- `apply`: public application form shell
 - default layout: authenticated internal shell with sidebar navigation, branding, and mobile drawer
 
 ## Hub Middleware
@@ -85,7 +93,11 @@
 - `auth`: requires an active session
 - `moderator`: requires `moderator`, `admin`, or `superadmin`
 - `admin`: requires `admin` or `superadmin`
+- `superadmin`: requires `superadmin`
+- `settings`: requires `admin` or `superadmin`, or `moderator` with at least one moderation right
+- `dev`: requires development mode
 - `locale.global`: applies DB- and cookie-backed locale routing for hub pages
+- `mandatory-fields.global`: enforces required custom field completion
 
 ## Internal Navigation Model (Hub)
 
@@ -108,6 +120,5 @@ Merged result is served by `GET /api/apps/navigation` and rendered by the defaul
 ## Notes
 
 - `/cms` is an embedded CMS session bootstrap, not a local editor.
-- `/apps/explore` embeds the marketplace via iframe controlled by `NUXT_PUBLIC_MARKETPLACE_EMBED_URL`.
 - `/apply/:flowId/:token` is the only public hub route — all other hub routes require authentication.
 - landing rendering is separate from hub and stays public.
