@@ -3,7 +3,7 @@
 Read this first when working anywhere in the Guildora platform.
 
 **Docs repository:** https://github.com/guildora/docs
-**Local MCP access:** `guildora-docs` server with `read_file` and `list_files`
+**Deployed docs:** https://guildora.github.io/docs
 
 ## Repositories
 

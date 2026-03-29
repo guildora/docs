@@ -25,31 +25,15 @@ Keep it repo-specific:
 - links back to the canonical docs above
 - project-specific test or release rules
 
-### MCP Access to Docs (Claude Code)
+### Accessing Docs (Claude Code)
 
-If you use Claude Code, register the `guildora-docs` MCP server once globally. This gives the agent direct access to all Guildora documentation from any working directory:
+All Guildora documentation is deployed at **https://guildora.github.io/docs** and accessible from any system — no local clone needed.
 
-```json
-// ~/.claude/settings.json
-{
-  "mcpServers": {
-    "guildora-docs": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "/path/to/Newguild/docs"
-      ]
-    }
-  }
-}
-```
-
-The agent can then call:
-- `read_file("/for-developers/manifest.md")` — manifest reference
-- `read_file("/for-developers/hub-integration.md")` — hub pages + API routes
-- `read_file("/DESIGN_SYSTEM.md")` — design tokens and component rules
-- `list_files("/for-developers")` — browse available docs
+Claude Code agents can fetch any doc page directly:
+- `https://guildora.github.io/docs/for-developers/manifest.html` — manifest reference
+- `https://guildora.github.io/docs/for-developers/hub-integration.html` — hub pages + API routes
+- `https://guildora.github.io/docs/DESIGN_SYSTEM.html` — design tokens and component rules
+- `https://guildora.github.io/docs/for-developers/` — browse available docs
 
 ---
 
@@ -195,7 +179,7 @@ Before completing a task or recommending a commit, the agent should verify:
 - Let the agent scaffold code from `manifest.json` (manifest-first approach)
 - Ask for commit recommendations after each logical block
 - Have the agent run through the test checklist before marking a feature done
-- Use the MCP `read_file` tool to access the latest doc versions
+- Fetch the latest docs from https://guildora.github.io/docs when needed
 
 ### Don't
 - Let the agent use bare `.input`, `.select`, `.textarea` classes for form fields — use `.field__control` + `.field__input` etc.
