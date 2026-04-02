@@ -12,6 +12,7 @@ This document describes the application-domain schema defined in `packages/share
 | `app_submission_status` | `pending`, `approved`, `rejected` | `app_marketplace_submissions.status` |
 | `application_flow_status` | `draft`, `active`, `inactive` | `application_flows.status` |
 | `application_status` | `pending`, `approved`, `rejected` | `applications.status` |
+| `editor_mode` | `simple`, `advanced` | `application_flows.editor_mode` |
 
 ## Tables
 
@@ -28,6 +29,7 @@ Primary identity table.
 | `avatar_url` | text nullable | current avatar URL (local public path preferred) |
 | `avatar_source` | text nullable | avatar origin marker (`local`, `discord`, or null) |
 | `primary_discord_role_name` | text nullable | highest Discord role name snapshot at last successful login |
+| `last_login_at` | timestamptz nullable | updated on each successful Discord OAuth login |
 | `created_at` | timestamptz | default now |
 | `updated_at` | timestamptz | auto-updated |
 
@@ -288,14 +290,15 @@ Global community-level settings used by the internal app.
 
 ### `application_flows`
 
-Visual node-based application form definitions (Vue Flow).
+Application form definitions. Two editor modes: **Simple** (linear section-based builder) and **Advanced** (visual Vue Flow graph editor). Both produce the same `flow_json` format.
 
 | Field | Type | Notes |
 | --- | --- | --- |
 | `id` | uuid PK | generated |
 | `name` | text | flow display name |
 | `status` | enum | `draft`, `active`, `inactive` |
-| `flow_json` | jsonb | Vue Flow graph definition (`ApplicationFlowGraph`) |
+| `editor_mode` | enum | `simple` (default), `advanced` — tracks which editor UI was used |
+| `flow_json` | jsonb | graph definition (`ApplicationFlowGraph`) |
 | `draft_flow_json` | jsonb nullable | work-in-progress draft of the flow graph |
 | `settings_json` | jsonb | flow settings (`ApplicationFlowSettings`) |
 | `created_by` | uuid nullable FK -> `users.id` | creator |
@@ -429,6 +432,46 @@ Controls moderator access to the application module.
 | `updated_at` | timestamptz | |
 | `updated_by` | uuid nullable FK -> `users.id` | |
 
+### `membership_settings`
+
+Singleton (id=1) controlling membership, auto-login, auto-sync, and auto-cleanup behavior.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | serial PK | singleton, always 1 |
+| `applications_required` | boolean | default true; when false, enables auto-login and hides applications section |
+| `default_community_role_id` | integer nullable FK -> `community_roles.id` | role assigned to auto-login users (ON DELETE SET NULL) |
+| `required_login_role_id` | text nullable | Discord role ID required to log in (only when applications disabled) |
+| `auto_sync_enabled` | boolean | default false |
+| `auto_sync_interval_hours` | integer | default 24 |
+| `auto_sync_last_run` | timestamptz nullable | |
+| `auto_cleanup_enabled` | boolean | default false |
+| `auto_cleanup_interval_hours` | integer | default 24 |
+| `auto_cleanup_last_run` | timestamptz nullable | |
+| `auto_cleanup_conditions` | jsonb | array of `{type, operator}` objects |
+| `cleanup_required_role_id` | text nullable | Discord role ID for missing-role condition |
+| `cleanup_inactive_days` | integer nullable | days threshold for login inactivity |
+| `cleanup_no_voice_days` | integer nullable | days threshold for voice inactivity |
+| `cleanup_role_whitelist` | jsonb | array of Discord role IDs preserved during cleanup |
+| `cleanup_protect_moderators` | boolean | default true |
+| `updated_at` | timestamptz | |
+| `updated_by` | uuid nullable FK -> `users.id` | |
+
+### `cleanup_log`
+
+Audit log for auto-cleanup actions. Each row represents one user removed by the cleanup cycle.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `user_id` | uuid nullable | null after user deletion |
+| `discord_id` | text | snapshot, preserved after deletion |
+| `discord_username` | text | snapshot, preserved after deletion |
+| `reason` | text | human-readable summary of matched conditions |
+| `conditions_matched` | jsonb | array of condition type strings that triggered removal |
+| `roles_removed` | jsonb | array of Discord role IDs removed before deletion |
+| `created_at` | timestamptz | indexed DESC for paginated queries |
+
 ## Relationship Summary
 
 - each user has one profile and one community-role assignment
@@ -436,7 +479,9 @@ Controls moderator access to the application module.
 - a user can hold multiple permission roles
 - selectable Discord roles define the self-service boundary for `/api/profile/discord-roles`
 - user Discord-role snapshots are informational and synchronization-oriented
-- theme, CMS access, community settings, and application access settings behave as singleton-style configuration tables
+- theme, CMS access, community settings, application access settings, and membership settings behave as singleton-style configuration tables
+- membership settings references one optional default community role
+- cleanup log entries reference a user ID that may become null after the user is deleted
 - community custom fields define the field schema; per-user values are stored in `profiles.custom_fields`
 - community tags are moderator-managed labels distinct from Discord roles
 - an application flow has many tokens, applications, file uploads, embeds, and moderator notification subscriptions

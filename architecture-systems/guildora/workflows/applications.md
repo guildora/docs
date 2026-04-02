@@ -4,7 +4,7 @@ This workflow covers flow-based membership applications. It is distinct from mar
 
 ## Data Model
 
-- `application_flows` — visual node-based flow definitions (Vue Flow)
+- `application_flows` — flow definitions with `editor_mode` (`simple` or `advanced`)
 - `applications` — individual submitted applications
 - `application_tokens` — single-use tokens for public form access
 - `application_file_uploads` — file attachments submitted with applications
@@ -16,16 +16,29 @@ This workflow covers flow-based membership applications. It is distinct from mar
 
 Each application flow has a status: `draft`, `active`, or `inactive`.
 
-- Staff creates a flow with a visual node graph in the Vue Flow editor at `/applications/flows/new`.
+- Staff creates a flow at `/applications/flows/new`. New flows default to **Simple Mode**.
 - The graph (`flow_json`) defines the applicant's journey: start → input nodes → info nodes → conditional branches → role assignment → end (or abort).
 - Flows can optionally store a `draft_flow_json` for work-in-progress edits before publishing.
 - Flow settings (`settings_json`) configure embed appearance, role assignments on submission/approval, welcome messages, concurrency rules, token expiry, DM templates, test mode, and archive retention.
 - Only `active` flows can accept new applications.
 
+### Editor Modes
+
+The `editor_mode` column (enum: `simple`, `advanced`) tracks which editor UI a flow uses:
+
+- **Simple Mode** (default for new flows): A linear, section-based form builder. Fields are grouped into named sections and reorderable via drag & drop within sections. Supports all input types, info blocks, and role assignment blocks. Does not support conditional branches or abort nodes. Internally generates a standard `ApplicationFlowGraph` (step_group nodes for sections, child nodes for fields, linear edges).
+- **Advanced Mode**: The visual Vue Flow graph editor. Supports all node types including conditional branches and abort nodes. Required for non-linear flows.
+
+**Bidirectional switching**: Simple ↔ Advanced is possible at any time. Switching from Advanced to Simple requires a compatibility check — if the graph contains conditional branches, abort nodes, or non-linear edges, the Simple tab is disabled with an explanatory hint. Switching from Simple to Advanced is always allowed.
+
+Both modes produce the same `flow_json` format. The conversion layer (`packages/shared/src/utils/flow-simple-convert.ts`) handles `sectionsToFlowGraph()`, `flowGraphToSections()`, and `canConvertToSimple()`.
+
+New flows are pre-filled with a gaming guild application template (2 sections, 6 fields).
+
 ### Node Types
 
 - `start` / `end` — entry and exit points
-- `input` — collects a form field (short text, long text, number, email, select, multi-select, yes/no, date, file upload, Discord username)
+- `input` — collects a form field (short text, long text, number, email, select, multi-select, yes/no, date, file upload, Discord username, Discord role single/multi)
 - `info` — displays informational markdown with optional CTA links
 - `conditional_branch` — branches the flow based on a previous input's answer
 - `abort` — terminates the flow with a message (e.g. ineligible applicant)
