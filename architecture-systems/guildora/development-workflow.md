@@ -40,7 +40,7 @@ App-specific scripts:
 
 - keep landing public and thin
 - treat `apps/web/server/api/auth/discord.get.ts` as a compatibility redirect shim, not the real auth implementation
-- landing content should be derived from CMS publication state, not duplicated locally
+- landing content is fetched from Hub's `/api/public/landing` endpoint — it is DB-backed, not CMS-backed
 
 ### Roles
 

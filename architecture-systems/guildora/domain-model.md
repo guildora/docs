@@ -13,6 +13,7 @@ This document describes the application-domain schema defined in `packages/share
 | `application_flow_status` | `draft`, `active`, `inactive` | `application_flows.status` |
 | `application_status` | `pending`, `approved`, `rejected` | `applications.status` |
 | `editor_mode` | `simple`, `advanced` | `application_flows.editor_mode` |
+| `landing_section_status` | `draft`, `published` | `landing_sections.status` |
 
 ## Tables
 
@@ -114,14 +115,43 @@ One community role per user.
 | `community_role_id` | integer FK -> `community_roles.id` | required |
 | `assigned_at` | timestamptz | |
 
+### `role_groups`
+
+Named groups for organizing selectable Discord roles.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `name` | text unique | group display name |
+| `description` | text nullable | |
+| `sort_order` | integer | UI ordering, default 0 |
+| `created_at` | timestamptz | |
+| `updated_at` | timestamptz | auto-updated |
+
 ### `selectable_discord_roles`
 
-Admin-curated allowlist for self-service Discord roles.
+Admin-curated allowlist for self-service Discord roles, optionally grouped.
 
 | Field | Type | Notes |
 | --- | --- | --- |
 | `discord_role_id` | text PK | guild role ID |
 | `role_name_snapshot` | text | role name at save time |
+| `group_id` | uuid nullable FK -> `role_groups.id` | optional group assignment (ON DELETE SET NULL) |
+| `emoji` | text nullable | display emoji |
+| `sort_order` | integer | ordering within group, default 0 |
+| `created_at` | timestamptz | |
+| `updated_at` | timestamptz | auto-updated |
+
+### `role_picker_embeds`
+
+Discord message embeds for role-picker interactions, one per group.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `group_id` | uuid unique FK -> `role_groups.id` | one embed per group (ON DELETE CASCADE) |
+| `discord_channel_id` | text | target Discord channel |
+| `discord_message_id` | text nullable | posted message ID |
 | `created_at` | timestamptz | |
 | `updated_at` | timestamptz | auto-updated |
 
@@ -254,9 +284,9 @@ Key-value storage for installed app data, scoped by app ID.
 
 Composite primary key: `(app_id, key)`.
 
-### `cms_access_settings`
+### `moderation_settings`
 
-Controls whether moderators can use embedded CMS access.
+Controls moderator access to various admin features.
 
 | Field | Type | Notes |
 | --- | --- | --- |
@@ -351,6 +381,7 @@ Individual application submissions tied to a flow.
 | `roles_assigned` | jsonb | Discord role IDs assigned on approval |
 | `pending_role_assignments` | jsonb | roles queued for assignment |
 | `display_name_composed` | text nullable | composed display name from answers |
+| `ticket_channel_id` | text nullable | Discord ticket channel ID |
 | `reviewed_by` | uuid nullable FK -> `users.id` | reviewer |
 | `reviewed_at` | timestamptz nullable | |
 | `created_at` | timestamptz | |
@@ -448,14 +479,24 @@ Singleton (id=1) controlling membership, auto-login, auto-sync, and auto-cleanup
 | `auto_cleanup_enabled` | boolean | default false |
 | `auto_cleanup_interval_hours` | integer | default 24 |
 | `auto_cleanup_last_run` | timestamptz nullable | |
-| `auto_cleanup_conditions` | jsonb | array of `{type, operator}` objects |
-| `cleanup_required_role_id` | text nullable | Discord role ID for missing-role condition |
-| `cleanup_inactive_days` | integer nullable | days threshold for login inactivity |
-| `cleanup_no_voice_days` | integer nullable | days threshold for voice inactivity |
+| `cleanup_role_configs` | jsonb | `RoleCleanupConfig[]` — per-permission-role cleanup configuration (see below) |
 | `cleanup_role_whitelist` | jsonb | array of Discord role IDs preserved during cleanup |
 | `cleanup_protect_moderators` | boolean | default true |
 | `updated_at` | timestamptz | |
 | `updated_by` | uuid nullable FK -> `users.id` | |
+
+`RoleCleanupConfig` shape:
+
+```ts
+interface RoleCleanupConfig {
+  permissionRoleName: string;
+  enabled: boolean;
+  conditions: { type: "orphan" | "missingRole" | "loginInactive" | "voiceInactive"; operator: "AND" | "OR" }[];
+  cleanupRequiredRoleId?: string | null;
+  cleanupInactiveDays?: number | null;
+  cleanupNoVoiceDays?: number | null;
+}
+```
 
 ### `cleanup_log`
 
@@ -472,17 +513,79 @@ Audit log for auto-cleanup actions. Each row represents one user removed by the 
 | `roles_removed` | jsonb | array of Discord role IDs removed before deletion |
 | `created_at` | timestamptz | indexed DESC for paginated queries |
 
+### `landing_templates`
+
+Built-in and custom landing page templates.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | text PK | template identifier (e.g. `default`) |
+| `name` | text | display name |
+| `description` | text nullable | |
+| `preview_url` | text nullable | template preview image |
+| `is_builtin` | boolean | defaults true |
+| `created_at` | timestamptz | |
+
+### `landing_pages`
+
+Landing page configuration (singleton-like, one row per locale).
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | serial PK | |
+| `active_template` | text FK -> `landing_templates.id` | default `default` (ON DELETE SET DEFAULT) |
+| `custom_css` | text nullable | custom CSS override |
+| `locale` | text | default `en` |
+| `meta_title` | text nullable | SEO title |
+| `meta_description` | text nullable | SEO description |
+| `published_at` | timestamptz nullable | last publish timestamp |
+| `updated_at` | timestamptz | auto-updated |
+| `updated_by` | uuid nullable FK -> `users.id` | |
+
+### `landing_sections`
+
+Individual content sections on the landing page.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `block_type` | text | section type identifier |
+| `sort_order` | integer | display order |
+| `visible` | boolean | defaults true |
+| `status` | enum `landing_section_status` | `draft` or `published`, defaults `published` |
+| `config` | jsonb | section configuration |
+| `content` | jsonb | section content data |
+| `updated_at` | timestamptz | auto-updated |
+| `updated_by` | uuid nullable FK -> `users.id` | |
+
+### `landing_page_versions`
+
+Snapshots of the landing page for version history and rollback.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `snapshot` | jsonb | full page state at time of save |
+| `label` | text nullable | optional version label |
+| `created_at` | timestamptz | |
+| `created_by` | uuid nullable FK -> `users.id` | |
+
 ## Relationship Summary
 
 - each user has one profile and one community-role assignment
 - a community role maps to exactly one permission role
 - a user can hold multiple permission roles
-- selectable Discord roles define the self-service boundary for `/api/profile/discord-roles`
+- role groups organize selectable Discord roles; each group can have one role-picker embed
+- selectable Discord roles optionally belong to a role group and define the self-service boundary for `/api/profile/discord-roles`
+- role picker embeds are Discord messages tied to a role group for reaction-based role assignment
 - user Discord-role snapshots are informational and synchronization-oriented
-- theme, CMS access, community settings, application access settings, and membership settings behave as singleton-style configuration tables
+- theme, moderation settings, community settings, application access settings, and membership settings behave as singleton-style configuration tables
 - membership settings references one optional default community role
 - cleanup log entries reference a user ID that may become null after the user is deleted
 - community custom fields define the field schema; per-user values are stored in `profiles.custom_fields`
 - community tags are moderator-managed labels distinct from Discord roles
 - an application flow has many tokens, applications, file uploads, embeds, and moderator notification subscriptions
 - an application belongs to one flow and may have many file uploads
+- landing templates have many landing pages; landing pages reference one active template
+- landing sections are ordered content blocks rendered on the public landing page
+- landing page versions store historical snapshots for rollback

@@ -11,7 +11,7 @@ This workflow allows the internal hub app to open a logged-in Payload admin sess
 ## Authorization Rules
 
 - admins and superadmins always qualify for CMS SSO
-- moderators qualify only if `cms_access_settings.allow_moderator_access` is enabled
+- moderators qualify only if `moderation_settings.allow_moderator_access` is enabled
 
 ## Hub Side
 

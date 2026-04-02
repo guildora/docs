@@ -50,6 +50,7 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | hub | `/settings/moderation-rights` | `settings` | admin, superadmin, or moderator with moderation rights |
 | hub | `/settings/apps` | `settings` | admin, superadmin, or moderator with moderation rights |
 | hub | `/settings/apps/review` | none (redirect) | admin, superadmin |
+| hub | `/settings/landing` | `settings` | admin, superadmin, or moderator with moderation rights |
 | hub | `/settings/dev-role-switcher` | `settings` | admin, superadmin, or moderator with moderation rights |
 | hub | `/dev` | `dev` | development-only |
 | hub | `/dev/reset` | `dev` | development-only |
@@ -88,7 +89,7 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/dev/users` | GET | staff in debug or switched flow |
 | `/api/dev/switch-user` | POST | staff in debug or switched flow |
 | `/api/dev/restore-user` | POST | switched debug session |
-| `/api/cms/session-url` | GET | moderator, admin, superadmin; moderator access depends on `cms_access_settings` |
+| `/api/cms/session-url` | GET | moderator, admin, superadmin; moderator access depends on `moderation_settings` |
 | `/api/mod/community-roles` | GET | moderator, admin, superadmin |
 | `/api/mod/community-roles` | POST | admin, superadmin |
 | `/api/mod/community-roles/:id` | PUT | admin, superadmin |
@@ -138,7 +139,6 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/admin/apps/:id` | DELETE | admin, superadmin |
 | `/api/admin/community-settings` | GET | admin, superadmin |
 | `/api/admin/community-settings` | PUT | admin, superadmin |
-| `/api/admin/cms-access` | PUT | admin, superadmin |
 | `/api/admin/permissions` | GET | admin, superadmin |
 | `/api/admin/community-roles` | POST | admin, superadmin |
 | `/api/admin/community-roles/:id` | PUT | admin, superadmin |
@@ -162,12 +162,48 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/admin/users/:id` | DELETE | admin, superadmin |
 | `/api/admin/users/by-community-role/:communityRoleId` | DELETE | admin, superadmin |
 | `/api/admin/dev/reset-mirror` | POST | admin, superadmin |
+| `/api/admin/membership-settings` | GET | admin, superadmin |
+| `/api/admin/membership-settings` | PUT | admin, superadmin |
+| `/api/admin/landing/page` | GET | admin, superadmin |
+| `/api/admin/landing/page` | PUT | admin, superadmin |
+| `/api/admin/landing/templates` | GET | admin, superadmin |
+| `/api/admin/landing/template` | PUT | admin, superadmin |
+| `/api/admin/landing/sections` | GET | admin, superadmin |
+| `/api/admin/landing/sections` | POST | admin, superadmin |
+| `/api/admin/landing/sections/:id` | PUT | admin, superadmin |
+| `/api/admin/landing/sections/:id` | DELETE | admin, superadmin |
+| `/api/admin/landing/sections/reorder` | PUT | admin, superadmin |
+| `/api/admin/landing/blocks` | GET | admin, superadmin |
+| `/api/admin/landing/publish` | POST | admin, superadmin |
+| `/api/admin/landing/reset` | POST | admin, superadmin |
+| `/api/admin/landing/versions` | GET | admin, superadmin |
+| `/api/admin/landing/versions/:id` | GET | admin, superadmin |
+| `/api/admin/landing/versions/:id/restore` | POST | admin, superadmin |
+| `/api/admin/landing-access` | PUT | admin, superadmin |
+| `/api/admin/role-groups` | GET | admin, superadmin |
+| `/api/admin/role-groups` | POST | admin, superadmin |
+| `/api/admin/role-groups/:id` | GET | admin, superadmin |
+| `/api/admin/role-groups/:id` | PUT | admin, superadmin |
+| `/api/admin/role-groups/:id` | DELETE | admin, superadmin |
+| `/api/admin/role-groups/:id/roles` | PUT | admin, superadmin |
+| `/api/admin/role-groups/:id/embed/deploy` | POST | admin, superadmin |
+| `/api/admin/role-groups/:id/embed` | DELETE | admin, superadmin |
+| `/api/admin/discord-channels` | GET | admin, superadmin |
+| `/api/admin/cleanup-log` | GET | admin, superadmin |
 | `/api/settings/files` | GET | admin, superadmin |
 | `/api/settings/files/:key` | DELETE | admin, superadmin |
 | `/api/settings/files/bucket` | DELETE | admin, superadmin |
 | `/api/settings/files/migrate` | POST | admin, superadmin |
 | `/api/settings/files/test-connection` | POST | admin, superadmin |
 | `/api/public/branding` | GET | public |
+| `/api/public/landing` | GET | public |
+| `/api/internal/landing/page` | GET | internal token |
+| `/api/internal/landing/sections` | GET | internal token |
+| `/api/internal/landing/sections` | POST | internal token |
+| `/api/internal/landing/sections/:id` | PUT | internal token |
+| `/api/internal/landing/sections/:id` | DELETE | internal token |
+| `/api/internal/landing/sections/reorder` | PUT | internal token |
+| `/api/internal/landing/publish` | POST | internal token |
 
 ### Web Compatibility API
 
@@ -181,5 +217,5 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 - `requireSession` allows any logged-in role, including `temporaer`.
 - Session payload should read `permissionRoles` first and `roles` only as compatibility fallback.
 - Landing does not own real auth; its `/api/auth/discord` route is only a forwarding shim.
-- The `settings` middleware allows admins and superadmins directly, plus moderators who have at least one moderation right enabled in `cms_access_settings`.
+- The `settings` middleware allows admins and superadmins directly, plus moderators who have at least one moderation right enabled in `moderation_settings`.
 - `/apply/:flowId/:token` is public but token-validated; it uses the `apply` layout, not the default authenticated layout.

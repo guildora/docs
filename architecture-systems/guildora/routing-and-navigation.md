@@ -9,15 +9,16 @@
 
 ## Public Routes (Web)
 
-- `/` renders the CMS-managed landing page.
+- `/` renders the DB-backed landing page fetched from Hub API.
 - localized routing follows `prefix_except_default`:
   - English remains unprefixed
   - German uses `/de`
 
 ## Landing Runtime Notes
 
-- landing fetches the `landing` page from Payload via `usePayload`
-- if CMS content is unavailable, landing shows a fallback info state and a login CTA
+- landing fetches published page data from Hub's `/api/public/landing` via the `useLanding` composable
+- sections are rendered by `LandingBlockRenderer` with block-type-specific components from `app/components/landing/blocks/`
+- if Hub is unreachable, landing shows a fallback info state and a login CTA
 - landing login CTA points to hub `/login?returnTo=/dashboard`
 
 ## Internal Routes (Hub)
@@ -69,6 +70,7 @@ All settings routes use the `settings` middleware, which allows admins, superadm
 - `/settings/moderation-rights` — granular moderation rights configuration
 - `/settings/apps` — app management
 - `/settings/apps/review` — app submission review (redirect)
+- `/settings/landing` — landing page editor (sections, templates, publish/version history)
 - `/settings/dev-role-switcher` — development role switcher
 
 ### Special Admin Routes

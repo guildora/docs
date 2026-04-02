@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`apps/cms` is the landing-page authoring system. It is separate from the internal hub and from the public landing renderer.
+`apps/cms` is the editorial content authoring system. It is separate from the internal hub and from the public landing renderer. **Note:** Landing page content is no longer managed by CMS — it is now managed directly in Hub via DB-backed landing tables and the `/settings/landing` editor.
 
 ## Stack
 
@@ -65,7 +65,7 @@ Current page blocks:
 - `youtube`
 - `discordInvite`
 
-These blocks define landing content rendered in `apps/web`.
+These blocks are available for CMS-authored page content. Note that landing page content is now managed separately in Hub, not via CMS.
 
 ## CMS SSO
 
@@ -82,5 +82,6 @@ CMS then:
 
 - CMS does not own main community tables in `public`
 - CMS access rules are separate from hub permission-role model
-- landing content is fetched by `apps/web` via CMS HTTP API
+- landing page content is **not** managed by CMS — it is managed in Hub via DB tables and served by `/api/public/landing`
+- CMS is used for editorial content only (pages, media, site settings)
 - hub iframe embedding does not make CMS part of the hub runtime itself

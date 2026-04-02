@@ -161,8 +161,7 @@ These routes are intended for development or explicit debug modes.
 | DELETE | `/api/admin/apps/:id` | admin | delete an installed app row |
 | GET | `/api/admin/community-settings` | admin | load community name and default locale |
 | PUT | `/api/admin/community-settings` | admin | update community name and default locale |
-| PUT | `/api/admin/cms-access` | admin | update whether moderators can open `/cms` |
-| GET | `/api/admin/permissions` | admin | load permission-role, community-role, and CMS access metadata |
+| GET | `/api/admin/permissions` | admin | load permission-role, community-role, and moderation settings metadata |
 | POST | `/api/admin/community-roles` | admin | create a community role including optional Discord role mapping |
 | PUT | `/api/admin/community-roles/:id` | admin | update a mapped community role |
 | DELETE | `/api/admin/community-roles/:id` | admin | delete a mapped community role |
@@ -180,10 +179,45 @@ These routes are intended for development or explicit debug modes.
 | DELETE | `/api/admin/tags/:id` | admin | delete a community tag |
 | POST | `/api/admin/users/batch-delete` | admin | batch delete multiple users |
 
+## Admin: Landing Page
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/admin/landing/page` | admin | load landing page settings |
+| PUT | `/api/admin/landing/page` | admin | update landing page settings (template, custom CSS, meta) |
+| GET | `/api/admin/landing/templates` | admin | list available landing templates |
+| PUT | `/api/admin/landing/template` | admin | set active landing template |
+| GET | `/api/admin/landing/sections` | admin | list all landing sections |
+| POST | `/api/admin/landing/sections` | admin | create a new landing section |
+| PUT | `/api/admin/landing/sections/:id` | admin | update a landing section |
+| DELETE | `/api/admin/landing/sections/:id` | admin | delete a landing section |
+| PUT | `/api/admin/landing/sections/reorder` | admin | reorder landing sections |
+| GET | `/api/admin/landing/blocks` | admin | list available block types |
+| POST | `/api/admin/landing/publish` | admin | publish landing page (creates version snapshot) |
+| POST | `/api/admin/landing/reset` | admin | reset landing page to last published state |
+| GET | `/api/admin/landing/versions` | admin | list landing page version history |
+| GET | `/api/admin/landing/versions/:id` | admin | get a specific version snapshot |
+| POST | `/api/admin/landing/versions/:id/restore` | admin | restore a specific version |
+| PUT | `/api/admin/landing-access` | admin | update landing page access settings |
+
+## Admin: Role Groups
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/admin/role-groups` | admin | list all role groups |
+| POST | `/api/admin/role-groups` | admin | create a role group |
+| GET | `/api/admin/role-groups/:id` | admin | get role group with selectable roles |
+| PUT | `/api/admin/role-groups/:id` | admin | update a role group |
+| DELETE | `/api/admin/role-groups/:id` | admin | delete a role group |
+| PUT | `/api/admin/role-groups/:id/roles` | admin | update selectable roles in a group |
+| POST | `/api/admin/role-groups/:id/embed/deploy` | admin | deploy role-picker embed to Discord |
+| DELETE | `/api/admin/role-groups/:id/embed` | admin | delete role-picker embed |
+
 ## Admin: Discord Role and Mirror Operations
 
 | Method | Path | Auth | Purpose |
 | --- | --- | --- | --- |
+| GET | `/api/admin/discord-channels` | admin | list guild channels from the bot bridge |
 | GET | `/api/admin/discord-roles` | admin | list guild roles and currently selectable self-service role IDs |
 | PUT | `/api/admin/discord-roles` | admin | replace the selectable self-service role allowlist |
 | POST | `/api/admin/discord-roles/self-import` | superadmin | import the current superadmin's own Discord roles into the local snapshot state |
@@ -197,6 +231,24 @@ These routes are intended for development or explicit debug modes.
 | DELETE | `/api/admin/users/by-community-role/:communityRoleId` | admin | bulk remove or reconcile users belonging to one community role |
 | POST | `/api/admin/dev/reset-mirror` | admin | reset admin mirror state used by the dev tooling |
 
+## Admin: Membership Settings and Cleanup
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/admin/membership-settings` | admin | load membership settings, community roles, and guild roles for config UI |
+| PUT | `/api/admin/membership-settings` | admin | update membership settings (applications toggle, auto-sync, auto-cleanup, conditions) |
+| GET | `/api/admin/cleanup-log` | admin | paginated audit log of auto-cleanup actions (query: `limit`, `offset`) |
+
+### Modified Auth Behavior
+
+When `membership_settings.applications_required = false`:
+
+- `GET /api/auth/discord` auto-creates users on login if they are guild members
+- If `required_login_role_id` is set, the user must have that Discord role
+- New users receive the configured `default_community_role_id`
+- Auth errors redirect to `/login?error=<code>` instead of throwing HTTP errors
+- `users.last_login_at` is updated on every successful login
+
 ## Settings: File Storage
 
 | Method | Path | Auth | Purpose |
@@ -207,11 +259,26 @@ These routes are intended for development or explicit debug modes.
 | POST | `/api/settings/files/migrate` | admin | migrate file storage between providers |
 | POST | `/api/settings/files/test-connection` | admin | test storage connection settings |
 
+## Internal Landing (MCP / Internal Token Auth)
+
+These endpoints are used by the MCP server and other internal services for programmatic landing page management.
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/internal/landing/page` | internal | load landing page settings |
+| GET | `/api/internal/landing/sections` | internal | list landing sections |
+| POST | `/api/internal/landing/sections` | internal | create a landing section |
+| PUT | `/api/internal/landing/sections/:id` | internal | update a landing section |
+| DELETE | `/api/internal/landing/sections/:id` | internal | delete a landing section |
+| PUT | `/api/internal/landing/sections/reorder` | internal | reorder landing sections |
+| POST | `/api/internal/landing/publish` | internal | publish landing page |
+
 ## Public Endpoints
 
 | Method | Path | Auth | Purpose |
 | --- | --- | --- | --- |
 | GET | `/api/public/branding` | public | public community branding (name, logo) |
+| GET | `/api/public/landing` | public | published landing page data for Web app rendering |
 
 ## Notes on Current Product Boundaries
 
