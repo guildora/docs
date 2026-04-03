@@ -1,6 +1,6 @@
 # Domain Model
 
-This document describes the application-domain schema defined in `packages/shared/src/db/schema.ts`. It covers the `public` schema used by the hub app and bot. Payload CMS tables in the `payload` schema are documented separately in [`subsystems/cms.md`](./subsystems/cms.md).
+This document describes the application-domain schema defined in `packages/shared/src/db/schema.ts`. It covers the `public` schema used by the hub app and bot.
 
 ## Enums
 
@@ -552,6 +552,7 @@ Landing page configuration (singleton-like, one row per locale).
 | `active_template` | text FK -> `landing_templates.id` | default `default` (ON DELETE SET DEFAULT) |
 | `custom_css` | text nullable | custom CSS override |
 | `locale` | text | default `en` |
+| `enabled_locales` | jsonb | `string[]` — active locales, defaults `["en"]` |
 | `meta_title` | text nullable | SEO title |
 | `meta_description` | text nullable | SEO description |
 | `published_at` | timestamptz nullable | last publish timestamp |
