@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`packages/shared` provides the shared contract between web, hub, CMS-adjacent tooling, and the Discord bot.
+`packages/shared` provides the shared contract between web, hub, and the Discord bot.
 
 ## Main Responsibilities
 

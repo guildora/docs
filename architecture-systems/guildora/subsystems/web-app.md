@@ -9,7 +9,7 @@
 - moderator workflows
 - admin workflows
 - Nitro APIs under `/api/*`
-- embedded CMS session bootstrap (`/cms`)
+- landing page editor and footer page management (`/settings/landing`)
 - marketplace iframe hosting for configured external marketplace URLs
 
 ## Important Directories
@@ -39,7 +39,6 @@
 - profile display names are stored centrally on `users`
 - language changes persist before UI locale switch
 - self-assignable Discord roles are limited to the admin allowlist
-- moderator access to `/cms` depends on `moderation_settings`
 - settings pages use the `settings` middleware which allows admins and moderators with moderation rights
 
 ## Note
