@@ -46,7 +46,6 @@ Or start individual services:
 ```bash
 pnpm --filter @guildora/web dev     # landing (port 3000)
 pnpm --filter @guildora/hub dev     # hub (port 3003)
-pnpm --filter @guildora/cms dev     # CMS (port 3002)
 pnpm --filter @guildora/bot dev     # bot
 ```
 
@@ -67,6 +66,5 @@ Start individual services:
 ```bash
 node apps/web/.output/server/index.mjs     # landing
 node apps/hub/.output/server/index.mjs     # hub
-pnpm --filter @guildora/cms start          # CMS
 pnpm --filter @guildora/bot start          # bot
 ```

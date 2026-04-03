@@ -4,13 +4,12 @@ Guildora is designed to be self-hosted. You run it on your own infrastructure an
 
 ## What You Get
 
-A full Guildora installation consists of four services:
+A full Guildora installation consists of three services:
 
 | Service | Technology | Purpose |
 |---|---|---|
-| **Hub** (`apps/hub`) | Nuxt 4 + Nitro | The main web app — members, moderation, admin, APIs |
+| **Hub** (`apps/hub`) | Nuxt 4 + Nitro | The main web app — members, moderation, admin, APIs, landing page editor |
 | **Landing** (`apps/web`) | Nuxt 4 | Public-facing landing page, OAuth redirect shim |
-| **CMS** (`apps/cms`) | Payload CMS 3 + Next.js | Editorial content for the landing page |
 | **Bot** (`apps/bot`) | Node.js + Discord.js | Discord sync, voice tracking, slash commands |
 
 All services share a single **PostgreSQL** database via a shared Drizzle schema package.
@@ -29,10 +28,7 @@ All services share a single **PostgreSQL** database via a shared Drizzle schema 
 |---|---|---|
 | Landing (`web`) | 3000 | 3000 |
 | Hub | 3003 | 3003 |
-| CMS | 3002 | 3001 |
 | Bot internal sync server | 3050 | 3050 |
-
-Note: CMS uses port 3002 in local development (`next dev -p 3002`) but port 3001 inside Docker containers. Reverse proxy configs (Caddy) should target the Docker port (3001).
 
 ## Marketplace Integration
 

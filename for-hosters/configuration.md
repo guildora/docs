@@ -10,8 +10,6 @@ All configuration is done via environment variables. Start from `.env.example` i
 |---|---|---|
 | `APP_HOST` / `NUXT_PUBLIC_APP_URL` | Landing | Public URL of the landing app |
 | `HUB_HOST` / `NUXT_PUBLIC_HUB_URL` | Hub | Public URL of the hub |
-| `CMS_HOST` / `NUXT_PUBLIC_CMS_URL` / `PAYLOAD_PUBLIC_SERVER_URL` | CMS | Public URL of the CMS |
-| `PAYLOAD_INTERNAL_URL` | Hub → CMS | Internal URL for hub-to-CMS SSO (server-side) |
 | `NUXT_PUBLIC_MARKETPLACE_EMBED_URL` | Hub | URL of the marketplace app (embedded in iframe) |
 
 ### Database
@@ -41,13 +39,6 @@ All configuration is done via environment variables. Start from `.env.example` i
 | `BOT_INTERNAL_URL` | Internal URL of the bot sync server (hub calls this) |
 | `BOT_INTERNAL_TOKEN` | Shared secret between hub and bot |
 | `BOT_INTERNAL_PORT` | Port for bot sync server (default: 3050) |
-
-### CMS
-
-| Variable | Description |
-|---|---|
-| `PAYLOAD_SECRET` | Payload CMS admin secret |
-| `CMS_SSO_SECRET` | Shared secret for hub→CMS SSO handoff |
 
 ### Bot Runtime
 

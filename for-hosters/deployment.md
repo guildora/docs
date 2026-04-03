@@ -6,8 +6,7 @@ The repository ships with a `docker-compose.yml` and `docker-compose.override.ym
 
 Services:
 - `web` — Landing page
-- `hub` — Internal Hub + API
-- `cms` — Payload CMS
+- `hub` — Internal Hub + API + Landing page editor
 - `bot` — Discord bot
 
 ```bash
@@ -16,9 +15,8 @@ docker compose up -d
 
 ### Service Dependencies
 
-- `web` depends on CMS (landing content) and hub (login handoff)
-- `hub` depends on CMS (embedded SSO) and bot (Discord sync)
-- `cms` stores uploads in the `cms_media` volume
+- `web` depends on hub (landing content via `/api/public/landing` and login handoff)
+- `hub` depends on bot (Discord sync)
 - `bot` runs on the internal Docker network; its sync server is only accessible to the hub
 
 ### Caddy (Reverse Proxy)
@@ -32,10 +30,6 @@ hub.example.com {
 
 example.com {
     reverse_proxy web:3000
-}
-
-cms.example.com {
-    reverse_proxy cms:3001
 }
 ```
 
@@ -54,14 +48,11 @@ Do not run seeds in production unless explicitly needed for role reconciliation.
 Keep these values strong and private:
 
 - `BOT_INTERNAL_TOKEN` — hub-to-bot communication
-- `CMS_SSO_SECRET` — hub-to-CMS SSO
-- `PAYLOAD_SECRET` — Payload admin
 - `NUXT_SESSION_PASSWORD` — session encryption (min 32 chars)
 
 ## Known Operational Caveats
 
-- Landing rendering depends on the CMS public URL being reachable from the `web` container
-- CMS SSO requires both `CMS_SSO_SECRET` and a valid CMS base URL in the hub runtime config
+- Landing rendering depends on the Hub public URL being reachable from the `web` container
 - Discord sync endpoints depend on bot internal server availability
 - The landing OAuth shim is a fallback — production OAuth should point directly to hub
 
