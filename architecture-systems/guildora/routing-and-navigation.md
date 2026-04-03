@@ -41,7 +41,6 @@
 - `/profile/customize` — profile customization (appearance, locale)
 - `/profile/[id]` redirects to `/members?member=:id`
 - `/apps/[appId]/[...slug]` — app-provided pages (ssr disabled)
-- `/cms` — embedded CMS session bootstrap
 
 ### Moderator Hub Routes
 
@@ -121,6 +120,5 @@ Merged result is served by `GET /api/apps/navigation` and rendered by the defaul
 
 ## Notes
 
-- `/cms` is an embedded CMS session bootstrap, not a local editor.
 - `/apply/:flowId/:token` is the only public hub route — all other hub routes require authentication.
 - landing rendering is separate from hub and stays public.
