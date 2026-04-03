@@ -2,7 +2,7 @@
 
 ## Monorepo Topology
 
-The repository is a pnpm workspace orchestrated with Turbo. It contains four deployable applications and two shared packages:
+The repository is a pnpm workspace orchestrated with Turbo. It contains four deployable applications and three shared packages:
 
 - `apps/web` (public landing)
 - `apps/hub` (internal app + auth + API)
@@ -10,6 +10,7 @@ The repository is a pnpm workspace orchestrated with Turbo. It contains four dep
 - `apps/bot` (Discord runtime)
 - `packages/shared` (schema, types, utilities)
 - `packages/app-sdk` (app extension SDK types)
+- `packages/mcp-server` (AI-driven landing page editing)
 
 All services use TypeScript. Hub and bot import shared schema and types from `@guildora/shared`. Web is intentionally thinner and primarily consumes Hub API content plus public runtime config.
 
