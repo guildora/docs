@@ -1,0 +1,30 @@
+name: Weekly Docs Audit
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'        # Monday 08:00 UTC
+  repository_dispatch:
+    types: [source-changed]     # Cross-repo trigger from guildora/guildora
+  workflow_dispatch:             # Manual trigger
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          prompt_file: .claude/docs-audit-prompt.md
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          allowed_tools: >-
+            Read,Write,Edit,Glob,Grep,
+            Bash(git:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(diff:*),Bash(gh:*)
+          max_turns: 50
+          use_commit_signing: true
