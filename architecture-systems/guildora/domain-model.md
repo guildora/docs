@@ -304,6 +304,22 @@ Controls moderator access to various admin features.
 | `updated_at` | timestamptz | |
 | `updated_by` | uuid nullable FK -> `users.id` | |
 
+### `footer_pages`
+
+Content pages linked from the landing footer (e.g. imprint, privacy).
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `slug` | text unique | URL slug |
+| `title` | jsonb | `Record<string, string>` — localized titles |
+| `content` | jsonb | `Record<string, string>` — localized content |
+| `sort_order` | integer | display order, default 0 |
+| `visible` | boolean | defaults true |
+| `created_at` | timestamptz | |
+| `updated_at` | timestamptz | auto-updated |
+| `updated_by` | uuid nullable FK -> `users.id` | |
+
 ### `community_settings`
 
 Global community-level settings used by the internal app.
