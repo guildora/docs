@@ -134,11 +134,12 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/admin/apps/update-check` | GET | admin, superadmin |
 | `/api/admin/apps/:appId/config` | PUT | admin, superadmin |
 | `/api/admin/apps/:appId/status` | PUT | admin, superadmin |
-| `/api/admin/apps/:appId/auto-update` | POST | admin, superadmin |
+| `/api/admin/apps/:appId/auto-update` | PUT | admin, superadmin |
 | `/api/admin/apps/:appId/update` | POST | admin, superadmin |
 | `/api/admin/apps/:id` | DELETE | admin, superadmin |
 | `/api/admin/community-settings` | GET | admin, superadmin |
 | `/api/admin/community-settings` | PUT | admin, superadmin |
+| `/api/admin/cms-access` | PUT | admin, superadmin |
 | `/api/admin/permissions` | GET | admin, superadmin |
 | `/api/admin/community-roles` | POST | admin, superadmin |
 | `/api/admin/community-roles/:id` | PUT | admin, superadmin |
@@ -204,6 +205,8 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/internal/landing/sections/:id` | DELETE | internal token |
 | `/api/internal/landing/sections/reorder` | PUT | internal token |
 | `/api/internal/landing/publish` | POST | internal token |
+| `/api/marketplace/apps` | GET | session |
+| `/api/feedback` | POST | session |
 
 ### Web Compatibility API
 
