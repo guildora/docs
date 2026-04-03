@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
   audit:
@@ -19,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: anthropics/claude-code-action@v1
+      - uses: anthropics/claude-code-base-action@v1
         with:
           prompt_file: .claude/docs-audit-prompt.md
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -27,4 +28,3 @@ jobs:
             Read,Write,Edit,Glob,Grep,
             Bash(git:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(diff:*),Bash(gh:*)
           max_turns: 50
-          use_commit_signing: true
