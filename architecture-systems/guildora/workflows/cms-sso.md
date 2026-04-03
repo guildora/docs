@@ -1,5 +1,7 @@
 # Workflow: CMS SSO
 
+> **TODO: verify —** The `GET /api/cms/session-url` handler and CMS SSO endpoint are no longer present in the codebase (`apps/hub/server/api/` and `apps/cms/`). The route remains in the actions registry. Confirm whether CMS SSO was removed or relocated.
+
 This workflow allows the internal hub app to open a logged-in Payload admin session.
 
 ## Actors
