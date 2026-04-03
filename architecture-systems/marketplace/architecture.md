@@ -40,7 +40,7 @@ Database
        └─ Drizzle ORM
 ```
 
-Landing page content is loaded from local `content/landing.md` via `@nuxt/content` — no external CMS dependency.
+Landing page content is loaded from local `content/landing.md` via `@nuxt/content`.
 
 ## Root App — Nuxt Full-Stack Application
 
