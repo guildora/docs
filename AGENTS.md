@@ -7,7 +7,7 @@ Read this first when working anywhere in the Guildora platform.
 
 ## Repositories
 
-- `guildora/` — core platform: Hub, Landing, CMS, Bot, shared DB, app-sdk
+- `guildora/` — core platform: Hub, Landing, Bot, shared DB, app-sdk, MCP server
 - `marketplace/` — private marketplace service and developer/admin portal
 - `apps/guildora-app-template/` — starter repo for Guildora apps
 - `docs/` — centralized documentation
@@ -33,5 +33,4 @@ Read this first when working anywhere in the Guildora platform.
 
 - Marketplace embed: Hub sets `NUXT_PUBLIC_MARKETPLACE_EMBED_URL`
 - Marketplace API source (Hub integration): `GET /api/hub/apps` (Marketplace)
-- CMS SSO: Hub embeds CMS with SSO token
 - Discord OAuth: Bot and Hub share the same Discord application
