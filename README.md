@@ -5,7 +5,7 @@
 
 Central documentation for Guildora.
 
-Guildora is a Discord-centered community platform consisting of a **Hub** (member web app), **Bot** (Discord event processor), **Marketplace** (community extensions), **CMS** (editorial content), and an **App Extension System** for community-built plugins.
+Guildora is a Discord-centered community platform consisting of a **Hub** (member web app + landing page editor), **Bot** (Discord event processor), **Marketplace** (community extensions), and an **App Extension System** for community-built plugins.
 
 ## Start Here
 

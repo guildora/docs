@@ -24,7 +24,6 @@ App-specific scripts:
 - `pnpm --filter @guildora/web dev`
 - `pnpm --filter @guildora/hub dev`
 - `pnpm --filter @guildora/hub test`
-- `pnpm --filter @guildora/cms dev`
 - `pnpm --filter @guildora/bot dev`
 
 ## Core Engineering Conventions
@@ -83,7 +82,7 @@ Automated tests are currently concentrated in hub utilities:
 - locale resolution and locale key parity
 - JSON response helpers
 
-There is currently no comparable automated suite for CMS, bot runtime, or end-to-end multi-service flows.
+There is currently no comparable automated suite for bot runtime or end-to-end multi-service flows.
 
 ## Recommended Change Flow
 

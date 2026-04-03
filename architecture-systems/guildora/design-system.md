@@ -12,8 +12,6 @@ This design system governs:
 - Hub: member area, moderator area, admin area (dark + light mode)
 - Landing page (dark mode only)
 
-CMS (`apps/cms`) uses Payload's own admin UI and is out of scope.
-
 ## Theme Modes
 
 - `guildora-dark`

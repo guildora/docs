@@ -1,6 +1,6 @@
 # i18n Architecture
 
-This document describes active language-resolution and localization rules across web, hub, CMS, and bot.
+This document describes active language-resolution and localization rules across web, hub, and bot.
 
 ## Supported Locales
 
@@ -32,7 +32,7 @@ Relevant utilities:
 - English URLs unprefixed, German prefixed with `/de`
 - hub applies locale middleware via `apps/hub/app/middleware/locale.global.ts`
 - landing locale handling is independent in `apps/web`
-- landing fetches CMS content with the current locale and `fallback-locale=en`
+- landing fetches published page data from Hub with the current locale
 
 ## UI Update Rule
 
@@ -63,15 +63,9 @@ Sideloaded app pages (`/apps/:appId/...`) are rendered from stored SFC source.
   3. raw key (default vue-i18n behavior when missing)
 - app messages are scoped per rendered app page and are not merged into the global hub i18n store
 
-## CMS Localization
+## Landing Content Localization
 
-Payload localization:
-
-- locales: `en`, `de`
-- default locale: `en`
-- fallback: `true`
-
-Localized fields include page titles, SEO, block content fields, media alt text, and site-settings labels.
+Landing sections and footer pages store content as localized `Record<string, string>` JSONB fields (keyed by locale). The `landing_pages.enabled_locales` column controls which locales are active. The public endpoint `/api/public/landing` resolves the best locale from the request.
 
 ## Bot Localization
 
