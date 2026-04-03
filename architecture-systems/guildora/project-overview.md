@@ -30,6 +30,9 @@ The hub is the operational center for members, moderation, admin tooling, and in
 - member directory search and voice-activity overview
 - self-service Discord role assignment from an admin-curated allowlist
 - admin synchronization between Discord guild membership and the internal database
+- configurable membership mode: application-based or open auto-login for Discord guild members
+- automatic periodic user sync from Discord (auto-sync)
+- automatic cleanup of users who no longer meet configurable conditions (orphans, missing roles, inactivity)
 - optional extension through installed app manifests and app navigation entries
 - embedded CMS admin access through hub-initiated SSO
 
