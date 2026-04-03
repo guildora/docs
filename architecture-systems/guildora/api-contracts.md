@@ -156,11 +156,12 @@ These routes are intended for development or explicit debug modes.
 | GET | `/api/admin/apps/update-check` | admin | check for available app updates |
 | PUT | `/api/admin/apps/:appId/config` | admin | store app configuration JSON |
 | PUT | `/api/admin/apps/:appId/status` | admin | set app status |
-| POST | `/api/admin/apps/:appId/auto-update` | admin | toggle auto-update for an app |
+| PUT | `/api/admin/apps/:appId/auto-update` | admin | toggle auto-update for an app |
 | POST | `/api/admin/apps/:appId/update` | admin | manually trigger app update |
 | DELETE | `/api/admin/apps/:id` | admin | delete an installed app row |
 | GET | `/api/admin/community-settings` | admin | load community name and default locale |
 | PUT | `/api/admin/community-settings` | admin | update community name and default locale |
+| PUT | `/api/admin/cms-access` | admin | update CMS access policy |
 | GET | `/api/admin/permissions` | admin | load permission-role, community-role, and moderation settings metadata |
 | POST | `/api/admin/community-roles` | admin | create a community role including optional Discord role mapping |
 | PUT | `/api/admin/community-roles/:id` | admin | update a mapped community role |
@@ -279,6 +280,18 @@ These endpoints are used by the MCP server and other internal services for progr
 | --- | --- | --- | --- |
 | GET | `/api/public/branding` | public | public community branding (name, logo) |
 | GET | `/api/public/landing` | public | published landing page data for Web app rendering |
+
+## Marketplace
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/marketplace/apps` | session | list marketplace apps available for install |
+
+## Feedback
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| POST | `/api/feedback` | session | submit user feedback |
 
 ## Notes on Current Product Boundaries
 
