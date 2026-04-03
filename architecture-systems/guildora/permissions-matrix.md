@@ -40,7 +40,6 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | hub | `/applications/archive` | `moderator` | moderator, admin, superadmin |
 | hub | `/applications/archive/:applicationId` | `moderator` | moderator, admin, superadmin |
 | hub | `/apply/:flowId/:token` | none; `apply` layout | public (token-validated) |
-| hub | `/cms` | `auth` | session at page level; real CMS access enforced by API |
 | hub | `/settings` | `settings` | admin, superadmin, or moderator with moderation rights |
 | hub | `/settings/design` | `settings` | admin, superadmin, or moderator with moderation rights |
 | hub | `/settings/permissions` | `settings` | admin, superadmin, or moderator with moderation rights |
@@ -89,7 +88,6 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/dev/users` | GET | staff in debug or switched flow |
 | `/api/dev/switch-user` | POST | staff in debug or switched flow |
 | `/api/dev/restore-user` | POST | switched debug session |
-| `/api/cms/session-url` | GET | moderator, admin, superadmin; moderator access depends on `moderation_settings` |
 | `/api/mod/community-roles` | GET | moderator, admin, superadmin |
 | `/api/mod/community-roles` | POST | admin, superadmin |
 | `/api/mod/community-roles/:id` | PUT | admin, superadmin |
@@ -139,7 +137,6 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/admin/apps/:id` | DELETE | admin, superadmin |
 | `/api/admin/community-settings` | GET | admin, superadmin |
 | `/api/admin/community-settings` | PUT | admin, superadmin |
-| `/api/admin/cms-access` | PUT | admin, superadmin |
 | `/api/admin/permissions` | GET | admin, superadmin |
 | `/api/admin/community-roles` | POST | admin, superadmin |
 | `/api/admin/community-roles/:id` | PUT | admin, superadmin |
@@ -176,11 +173,17 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/admin/landing/sections/reorder` | PUT | admin, superadmin |
 | `/api/admin/landing/blocks` | GET | admin, superadmin |
 | `/api/admin/landing/publish` | POST | admin, superadmin |
+| `/api/admin/landing/unpublish` | POST | admin, superadmin |
 | `/api/admin/landing/reset` | POST | admin, superadmin |
 | `/api/admin/landing/versions` | GET | admin, superadmin |
 | `/api/admin/landing/versions/:id` | GET | admin, superadmin |
 | `/api/admin/landing/versions/:id/restore` | POST | admin, superadmin |
 | `/api/admin/landing-access` | PUT | admin, superadmin |
+| `/api/admin/landing/footer-pages` | GET | admin, superadmin |
+| `/api/admin/landing/footer-pages` | POST | admin, superadmin |
+| `/api/admin/landing/footer-pages/:id` | PUT | admin, superadmin |
+| `/api/admin/landing/footer-pages/:id` | DELETE | admin, superadmin |
+| `/api/admin/landing/footer-pages/reorder` | PUT | admin, superadmin |
 | `/api/admin/role-groups` | GET | admin, superadmin |
 | `/api/admin/role-groups` | POST | admin, superadmin |
 | `/api/admin/role-groups/:id` | GET | admin, superadmin |
@@ -198,6 +201,7 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 | `/api/settings/files/test-connection` | POST | admin, superadmin |
 | `/api/public/branding` | GET | public |
 | `/api/public/landing` | GET | public |
+| `/api/public/footer-pages` | GET | public |
 | `/api/internal/landing/page` | GET | internal token |
 | `/api/internal/landing/sections` | GET | internal token |
 | `/api/internal/landing/sections` | POST | internal token |
@@ -216,7 +220,6 @@ This matrix is derived from current route middleware and Nitro auth utilities in
 
 ## Important Nuances
 
-- `/cms` page-level middleware only checks login; actual authorization is done by `/api/cms/session-url`.
 - `requireSession` allows any logged-in role, including `temporaer`.
 - Session payload should read `permissionRoles` first and `roles` only as compatibility fallback.
 - Landing does not own real auth; its `/api/auth/discord` route is only a forwarding shim.
