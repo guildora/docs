@@ -2,15 +2,16 @@
 
 ## Monorepo Topology
 
-The repository is a pnpm workspace orchestrated with Turbo. It contains four deployable applications and three shared packages:
+The repository is a pnpm workspace orchestrated with Turbo. It contains three deployable applications and three shared packages:
 
 - `apps/web` (public landing)
 - `apps/hub` (internal app + auth + API)
-- `apps/cms` (Payload authoring)
 - `apps/bot` (Discord runtime)
 - `packages/shared` (schema, types, utilities)
 - `packages/app-sdk` (app extension SDK types)
 - `packages/mcp-server` (AI-driven landing page editing)
+
+> **Deprecated:** `apps/cms` (Payload CMS) has been removed. Landing page content and footer pages are now managed directly in Hub via DB-backed tables and the `/settings/landing` editor.
 
 All services use TypeScript. Hub and bot import shared schema and types from `@guildora/shared`. Web is intentionally thinner and primarily consumes Hub API content plus public runtime config.
 
@@ -34,13 +35,7 @@ All services use TypeScript. Hub and bot import shared schema and types from `@g
   - `auth` layout for login
   - default layout as the authenticated internal shell
 
-### CMS
-
-- Framework: Payload CMS 3 on Next.js
-- DB schema: `payload`
-- Content model: pages, media, CMS users, site settings, reusable blocks
-- Access model: CMS-local roles (`editor`, `moderator`, `admin`)
-- Integration surface: public content API plus `/api/sso` for signed hub-to-CMS session bootstrap
+> **Deprecated:** CMS (`apps/cms`, Payload CMS 3 on Next.js) has been removed. Its content management responsibilities have been absorbed by Hub's built-in landing page editor and footer page management.
 
 ### Discord Bot
 
@@ -77,10 +72,9 @@ All services use TypeScript. Hub and bot import shared schema and types from `@g
 
 ## Database Ownership
 
-The repository uses one PostgreSQL instance with two logical areas:
+The repository uses one PostgreSQL instance:
 
 - `public` schema for app domain (managed by Drizzle)
-- `payload` schema for CMS-owned tables (managed by Payload)
 
 ## Key Data Flows
 
@@ -111,14 +105,6 @@ The repository uses one PostgreSQL instance with two logical areas:
 3. Locale preference is stored canonically in `profiles.locale_preference`.
 4. Hub can push nickname and role updates via the bot bridge.
 
-### CMS Access (Hub + CMS)
-
-1. Authenticated user opens `/cms` inside hub.
-2. Hub validates app-role access plus moderator CMS policy.
-3. Hub signs a short-lived SSO token.
-4. CMS verifies the token, upserts a CMS user, logs the user into Payload, and redirects to `/admin`.
-5. Hub embeds that URL in an iframe.
-
 ### Discord Mirror / Admin Import (Hub + Bot)
 
 1. Admins map community roles to Discord roles.
@@ -144,12 +130,10 @@ All plugins hook into `nitroApp.hooks.hook("close", ...)` for clean shutdown.
 - Discord OAuth for hub login
 - Discord Gateway and REST APIs via `discord.js`
 - GitHub raw/blob URLs for app sideload manifests
-- Payload CMS SSO endpoint for embedded admin access
 
 ## Architecture Constraints
 
 - Hub is the source of truth for internal profiles, moderation, admin workflows, and operational `/api/*` behavior.
 - Web is a public landing renderer consuming Hub API, with one OAuth redirect shim, not an internal workflow host.
 - Bot is the source of truth for live guild state and manageable Discord role operations.
-- CMS content remains isolated from internal app-domain tables.
 - Installed apps can contribute navigation, API routes, Vue pages, and bot hooks through their manifest and bundled code.
