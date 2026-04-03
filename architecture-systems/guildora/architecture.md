@@ -11,8 +11,6 @@ The repository is a pnpm workspace orchestrated with Turbo. It contains three de
 - `packages/app-sdk` (app extension SDK types)
 - `packages/mcp-server` (AI-driven landing page editing)
 
-> **Deprecated:** `apps/cms` (Payload CMS) has been removed. Landing page content and footer pages are now managed directly in Hub via DB-backed tables and the `/settings/landing` editor.
-
 All services use TypeScript. Hub and bot import shared schema and types from `@guildora/shared`. Web is intentionally thinner and primarily consumes Hub API content plus public runtime config.
 
 ## Runtime Components
@@ -34,8 +32,6 @@ All services use TypeScript. Hub and bot import shared schema and types from `@g
 - Layout model:
   - `auth` layout for login
   - default layout as the authenticated internal shell
-
-> **Deprecated:** CMS (`apps/cms`, Payload CMS 3 on Next.js) has been removed. Its content management responsibilities have been absorbed by Hub's built-in landing page editor and footer page management.
 
 ### Discord Bot
 
