@@ -26,6 +26,9 @@ The `manifest.json` file at the repo root is required. It is fetched by the Guil
     "panelGroups": [/* see below */]
   },
 
+  // ── Homepage ──────────────────────────────────────────────────────────
+  "homepageUrl": "https://...",      // optional | project homepage
+
   // ── Permissions ───────────────────────────────────────────────────────
   "permissions": [/* see below */],
 
@@ -49,9 +52,14 @@ The `manifest.json` file at the repo root is required. It is fetched by the Guil
     "src/lib/custom-parser.ts"
   ],
 
+  // ── Migrations ────────────────────────────────────────────────────────
+  "migrations": [
+    "migrations/001_init.sql"
+  ],
+
   // ── Environment ───────────────────────────────────────────────────────
   "requiredEnv": [
-    { "key": "API_SECRET", "description": "Secret for external API" }
+    "API_SECRET"
   ],
 
   // ── Install notes ─────────────────────────────────────────────────────
@@ -117,19 +125,23 @@ Result: plain users click the rail item → direct navigation. Moderators get a 
 ## permissions
 
 ```jsonc
-{ "key": "read:member", "description": "Read member profiles" }
+{
+  "id": "read:member",              // required | unique permission identifier
+  "label": "Read member profiles",  // required | short display label
+  "description": "Access to read member profile data", // required | longer explanation
+  "required": false                 // optional | defaults to false
+}
 ```
-
-Available keys: `read:member`, `write:member`, `read:messages`, `write:messages`, `read:voice`, `read:roles`, `write:roles`
 
 ## pages
 
 ```jsonc
 {
-  "id": "my-page",                  // unique
-  "path": "/apps/my-app/page",      // must start with /apps/
-  "file": "src/pages/page.vue",     // relative to repo root
-  "requiredRoles": ["user"]         // optional
+  "id": "my-page",                       // required | unique
+  "path": "/apps/my-app/page",           // required | must start with /apps/
+  "title": "My Page",                    // required | page display title
+  "component": "src/pages/page.vue",     // optional | relative path to Vue SFC source
+  "requiredRoles": ["user"]              // optional
 }
 ```
 
@@ -137,10 +149,9 @@ Available keys: `read:member`, `write:member`, `read:messages`, `write:messages`
 
 ```jsonc
 {
-  "id": "my-route",                        // unique
-  "method": "GET",                          // GET | POST | PUT | DELETE | PATCH
-  "path": "/api/apps/my-app/data",          // must start with /api/apps/
-  "file": "src/api/data.get.ts",            // relative to repo root
+  "method": "GET",                          // required | GET | POST | PUT | DELETE | PATCH
+  "path": "/api/apps/my-app/data",          // required | must start with /api/apps/
+  "handler": "src/api/data.get.ts",         // required | relative path to handler file
   "requiredRoles": ["user"]                 // optional
 }
 ```
@@ -179,17 +190,34 @@ Slash commands registered with Discord when the app is activated:
 ## configFields
 
 ```jsonc
+{
+  "key": "greeting",                     // required | unique config key
+  "label": "Greeting",                   // required | display label
+  "description": "The welcome message",  // optional
+  "type": "string",                      // required | string | number | boolean | select | json
+  "required": false,                     // optional | defaults to false
+  "defaultValue": "Hello",              // optional | initial value
+  "options": []                          // optional | choices for select type
+}
+```
+
+Examples by type:
+
+```jsonc
 // type: string
-{ "key": "greeting", "type": "string", "label": "Greeting", "default": "Hello" }
+{ "key": "greeting", "type": "string", "label": "Greeting", "defaultValue": "Hello" }
 
 // type: number
-{ "key": "limit", "type": "number", "label": "Limit", "default": 10, "min": 1, "max": 100 }
+{ "key": "limit", "type": "number", "label": "Limit", "defaultValue": 10 }
 
 // type: boolean
-{ "key": "enabled", "type": "boolean", "label": "Enable", "default": true }
+{ "key": "enabled", "type": "boolean", "label": "Enable", "defaultValue": true }
 
 // type: select
-{ "key": "tier", "type": "select", "label": "Tier", "options": ["a","b","c"], "default": "a" }
+{ "key": "tier", "type": "select", "label": "Tier", "options": ["a","b","c"], "defaultValue": "a" }
+
+// type: json
+{ "key": "advanced", "type": "json", "label": "Advanced Config" }
 ```
 
 ## includes
@@ -213,7 +241,10 @@ Optional array of repo-relative file paths to include in the code bundle beyond 
 |---------|-----|
 | `id` contains uppercase or spaces | Use only `kebab-case` |
 | `pages[].path` doesn't start with `/apps/` | Must be `/apps/your-app-id/...` |
+| `pages[]` missing `title` | `title` is required for every page |
 | `apiRoutes[].path` doesn't start with `/api/apps/` | Must be `/api/apps/your-app-id/...` |
+| Using `file` instead of `component` in pages | The field is `component` (optional) |
+| Using `file` instead of `handler` in apiRoutes | The field is `handler` |
 | `panelGroups[].railItemId` doesn't match a `rail[].id` | IDs must match exactly |
 | Bot hook name typo | Check capitalization: `onVoiceActivity` not `onVoiceactivty` |
 | Using `entries` in `panelGroups` | Use `items` instead |
