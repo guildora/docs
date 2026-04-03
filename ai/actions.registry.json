@@ -28,8 +28,6 @@
     { "id": "dev-switch-user", "name": "Switch dev session user", "method": "POST", "path": "/api/dev/switch-user", "requiredRoles": ["moderator", "admin", "superadmin"], "docsRef": "../docs/api-contracts.md#development-role-switching" },
     { "id": "dev-restore-user", "name": "Restore dev session user", "method": "POST", "path": "/api/dev/restore-user", "requiredRoles": ["moderator", "admin", "superadmin"], "docsRef": "../docs/api-contracts.md#development-role-switching" },
 
-    { "id": "cms-session-url", "name": "Create CMS SSO URL", "method": "GET", "path": "/api/cms/session-url", "requiredRoles": ["moderator", "admin", "superadmin"], "docsRef": "../docs/workflows/cms-sso.md" },
-
     { "id": "mod-community-roles-list", "name": "List moderation community roles", "method": "GET", "path": "/api/mod/community-roles", "requiredRoles": ["moderator", "admin", "superadmin"], "docsRef": "../docs/api-contracts.md#moderator-area" },
     { "id": "mod-community-roles-create", "name": "Create moderation community role", "method": "POST", "path": "/api/mod/community-roles", "requiredRoles": ["admin", "superadmin"], "docsRef": "../docs/api-contracts.md#moderator-area" },
     { "id": "mod-community-roles-update", "name": "Update moderation community role", "method": "PUT", "path": "/api/mod/community-roles/:id", "requiredRoles": ["admin", "superadmin"], "docsRef": "../docs/api-contracts.md#moderator-area" },
@@ -57,7 +55,6 @@
     { "id": "admin-community-settings-get", "name": "Get community settings", "method": "GET", "path": "/api/admin/community-settings", "requiredRoles": ["admin", "superadmin"], "docsRef": "../docs/api-contracts.md#admin-theme-community-and-app-management" },
     { "id": "admin-community-settings-put", "name": "Update community settings (incl. displayNameTemplate)", "method": "PUT", "path": "/api/admin/community-settings", "requiredRoles": ["admin", "superadmin"], "docsRef": "../docs/api-contracts.md#admin-theme-community-and-app-management" },
     { "id": "community-display-name-template-get", "name": "Get display name template (authenticated)", "method": "GET", "path": "/api/community-settings/display-name-template", "requiredRoles": ["user", "moderator", "admin", "superadmin"] },
-    { "id": "admin-cms-access-put", "name": "Update CMS access policy", "method": "PUT", "path": "/api/admin/cms-access", "requiredRoles": ["admin", "superadmin"], "docsRef": "../docs/workflows/cms-sso.md" },
     { "id": "admin-permissions-get", "name": "Get permission and community role metadata", "method": "GET", "path": "/api/admin/permissions", "requiredRoles": ["admin", "superadmin"], "docsRef": "../docs/api-contracts.md#admin-theme-community-and-app-management" },
     { "id": "admin-community-role-create", "name": "Create mapped community role", "method": "POST", "path": "/api/admin/community-roles", "requiredRoles": ["admin", "superadmin"], "docsRef": "../docs/workflows/admin-user-mirroring.md" },
     { "id": "admin-community-role-update", "name": "Update mapped community role", "method": "PUT", "path": "/api/admin/community-roles/:id", "requiredRoles": ["admin", "superadmin"], "docsRef": "../docs/workflows/admin-user-mirroring.md" },
