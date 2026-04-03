@@ -17,7 +17,7 @@ See also [`permissions-matrix.md`](./permissions-matrix.md).
 
 ## App Ownership Summary
 
-- `apps/hub` owns the real Discord OAuth callback, logout, internal resources, member APIs, moderator APIs, admin APIs, and CMS SSO bootstrap.
+- `apps/hub` owns the real Discord OAuth callback, logout, internal resources, member APIs, moderator APIs, and admin APIs.
 - `apps/web` owns one compatibility route at `/api/auth/discord` that redirects the request to hub.
 
 ## Auth
@@ -87,12 +87,6 @@ These routes are intended for development or explicit debug modes.
 | POST | `/api/dev/switch-user` | staff or switched debug session | replace the active session user |
 | POST | `/api/dev/restore-user` | switched debug session | restore the original session user |
 
-## CMS Session Bootstrap
-
-| Method | Path | Auth | Purpose |
-| --- | --- | --- | --- |
-| GET | `/api/cms/session-url` | session plus CMS access check | create a short-lived signed SSO URL for embedded Payload admin |
-
 ## Moderator Area
 
 | Method | Path | Auth | Purpose |
@@ -161,7 +155,6 @@ These routes are intended for development or explicit debug modes.
 | DELETE | `/api/admin/apps/:id` | admin | delete an installed app row |
 | GET | `/api/admin/community-settings` | admin | load community name and default locale |
 | PUT | `/api/admin/community-settings` | admin | update community name and default locale |
-| PUT | `/api/admin/cms-access` | admin | update CMS access policy |
 | GET | `/api/admin/permissions` | admin | load permission-role, community-role, and moderation settings metadata |
 | POST | `/api/admin/community-roles` | admin | create a community role including optional Discord role mapping |
 | PUT | `/api/admin/community-roles/:id` | admin | update a mapped community role |
@@ -195,11 +188,17 @@ These routes are intended for development or explicit debug modes.
 | PUT | `/api/admin/landing/sections/reorder` | admin | reorder landing sections |
 | GET | `/api/admin/landing/blocks` | admin | list available block types |
 | POST | `/api/admin/landing/publish` | admin | publish landing page (creates version snapshot) |
-| POST | `/api/admin/landing/reset` | admin | reset landing page to last published state |
+| POST | `/api/admin/landing/unpublish` | admin | unpublish published sections |
+| POST | `/api/admin/landing/reset` | admin | reset landing page to template defaults (snapshots current state first) |
 | GET | `/api/admin/landing/versions` | admin | list landing page version history |
 | GET | `/api/admin/landing/versions/:id` | admin | get a specific version snapshot |
 | POST | `/api/admin/landing/versions/:id/restore` | admin | restore a specific version |
 | PUT | `/api/admin/landing-access` | admin | update landing page access settings |
+| GET | `/api/admin/landing/footer-pages` | admin | list footer pages |
+| POST | `/api/admin/landing/footer-pages` | admin | create a footer page |
+| PUT | `/api/admin/landing/footer-pages/:id` | admin | update a footer page |
+| DELETE | `/api/admin/landing/footer-pages/:id` | admin | delete a footer page |
+| PUT | `/api/admin/landing/footer-pages/reorder` | admin | reorder footer pages |
 
 ## Admin: Role Groups
 
@@ -280,6 +279,7 @@ These endpoints are used by the MCP server and other internal services for progr
 | --- | --- | --- | --- |
 | GET | `/api/public/branding` | public | public community branding (name, logo) |
 | GET | `/api/public/landing` | public | published landing page data for Web app rendering |
+| GET | `/api/public/footer-pages` | public | published footer pages by locale (supports single slug query) |
 
 ## Marketplace
 
