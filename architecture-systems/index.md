@@ -6,7 +6,7 @@ Technical platform documentation for Guildora maintainers and contributors.
 
 → [guildora/](./guildora/index.md)
 
-Core platform: Hub, Landing, CMS, Bot, shared package.
+Core platform: Hub, Landing, Bot, shared package, MCP server.
 
 ## Marketplace
 

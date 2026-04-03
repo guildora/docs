@@ -28,7 +28,6 @@ Canonical technical documentation for the Guildora monorepo.
 
 - Hub app: [subsystems/web-app.md](./subsystems/web-app.md)
 - Web landing: [subsystems/web-landing.md](./subsystems/web-landing.md)
-- CMS: [subsystems/cms.md](./subsystems/cms.md)
 - Discord bot: [subsystems/bot.md](./subsystems/bot.md)
 - Shared package: [subsystems/shared-package.md](./subsystems/shared-package.md)
 
@@ -37,7 +36,6 @@ Canonical technical documentation for the Guildora monorepo.
 - Community applications: [workflows/applications.md](./workflows/applications.md)
 - Discord role management: [workflows/discord-role-management.md](./workflows/discord-role-management.md)
 - Admin user mirroring: [workflows/admin-user-mirroring.md](./workflows/admin-user-mirroring.md)
-- CMS SSO: [workflows/cms-sso.md](./workflows/cms-sso.md)
 - App lifecycle: [workflows/app-lifecycle.md](./workflows/app-lifecycle.md)
 - Marketplace submissions: [workflows/marketplace-submissions.md](./workflows/marketplace-submissions.md)
 
