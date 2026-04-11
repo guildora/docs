@@ -14,6 +14,8 @@ This document describes the application-domain schema defined in `packages/share
 | `application_status` | `pending`, `approved`, `rejected` | `applications.status` |
 | `editor_mode` | `simple`, `advanced` | `application_flows.editor_mode` |
 | `landing_section_status` | `draft`, `published` | `landing_sections.status` |
+| `platform_type` | `discord`, `matrix` | `platform_connections.platform`, `user_platform_accounts.platform`, `users.primary_platform`, `voice_sessions.platform` |
+| `platform_connection_status` | `connected`, `disconnected`, `error` | `platform_connections.status` |
 
 ## Tables
 
@@ -24,19 +26,21 @@ Primary identity table.
 | Field | Type | Notes |
 | --- | --- | --- |
 | `id` | uuid PK | generated |
-| `discord_id` | text unique | canonical Discord identity |
+| `discord_id` | text unique **nullable** | Discord identity (nullable since Matrix-only users exist) |
 | `email` | text nullable | usually from OAuth |
 | `display_name` | text | serialized profile name |
 | `avatar_url` | text nullable | current avatar URL (local public path preferred) |
-| `avatar_source` | text nullable | avatar origin marker (`local`, `discord`, or null) |
+| `avatar_source` | text nullable | avatar origin marker (`local`, `discord`, `matrix`, or null) |
 | `primary_discord_role_name` | text nullable | highest Discord role name snapshot at last successful login |
-| `last_login_at` | timestamptz nullable | updated on each successful Discord OAuth login |
+| `primary_platform` | platform_type nullable | preferred platform for display (`discord` or `matrix`), default `discord` |
+| `last_login_at` | timestamptz nullable | updated on each successful login |
 | `created_at` | timestamptz | default now |
 | `updated_at` | timestamptz | auto-updated |
 
 Relations:
 
 - one profile
+- many platform accounts (`user_platform_accounts`)
 - many permission-role assignments
 - one community-role assignment
 - many Discord-role snapshots
@@ -68,6 +72,46 @@ Known `custom_fields` keys used by current code:
 - `localePreference` as a legacy read fallback
 
 There is currently no `bio` column in the schema.
+
+### `user_platform_accounts`
+
+Links Guildora users to external platform identities. A user can have multiple linked accounts (e.g. both Discord and Matrix).
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `user_id` | uuid FK -> `users.id` | cascade delete |
+| `platform` | platform_type | `discord` or `matrix` |
+| `platform_user_id` | text | Discord snowflake or Matrix MXID (`@user:server`) |
+| `platform_username` | text nullable | display name on that platform |
+| `platform_avatar_url` | text nullable | avatar URL on that platform |
+| `is_primary` | boolean | which account is "main" for display, default false |
+| `linked_at` | timestamptz | default now |
+
+Unique constraint: `(platform, platform_user_id)`.
+
+### `platform_connections`
+
+Community-level platform configuration. Stores credentials and bot connection details for each connected platform. Managed via Settings > Platforms in the admin UI.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid PK | generated |
+| `platform` | platform_type unique | `discord` or `matrix` |
+| `enabled` | boolean | default true |
+| `credentials` | jsonb | platform-specific credentials (see below) |
+| `bot_internal_url` | text nullable | e.g. `http://bot:3050` or `http://matrix-bot:3051` |
+| `bot_internal_token` | text nullable | shared secret for Hub-Bot communication |
+| `status` | platform_connection_status | `connected`, `disconnected`, or `error` |
+| `status_message` | text nullable | human-readable status detail |
+| `last_health_check` | timestamptz nullable | last successful health check |
+| `created_at` | timestamptz | |
+| `updated_at` | timestamptz | auto-updated |
+
+**Discord credentials shape:** `{ botToken, clientId, clientSecret, guildId }`
+**Matrix credentials shape:** `{ homeserverUrl, accessToken, spaceId }`
+
+Falls back to `.env` variables when no DB entry exists (backward compatibility).
 
 ### `permission_roles`
 
@@ -168,13 +212,14 @@ Snapshot of Discord roles currently assigned to a user.
 
 ### `voice_sessions`
 
-Discord voice-session ledger.
+Voice/presence session ledger (Discord voice channels or Matrix Element Call rooms).
 
 | Field | Type | Notes |
 | --- | --- | --- |
 | `id` | uuid PK | generated |
 | `user_id` | uuid FK -> `users.id` | required |
-| `channel_id` | text nullable | Discord channel ID |
+| `channel_id` | text nullable | Discord channel ID or Matrix room ID |
+| `platform` | platform_type nullable | `discord` or `matrix`, default `discord` |
 | `started_at` | timestamptz | required |
 | `ended_at` | timestamptz nullable | null while open |
 | `duration_minutes` | integer nullable | calculated when closed |
@@ -589,7 +634,7 @@ Snapshots of the landing page for version history and rollback.
 
 ## Relationship Summary
 
-- each user has one profile and one community-role assignment
+- each user has one profile, one community-role assignment, and zero or more platform accounts
 - a community role maps to exactly one permission role
 - a user can hold multiple permission roles
 - role groups organize selectable Discord roles; each group can have one role-picker embed
