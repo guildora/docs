@@ -6,6 +6,8 @@ This document describes the application-domain schema defined in `packages/share
 
 | Enum | Values | Used by |
 | --- | --- | --- |
+| `platform_type` | `discord`, `matrix` | `platform_connections.platform`, `user_platform_accounts.platform`, `users.primary_platform`, `voice_sessions.platform` |
+| `platform_connection_status` | `connected`, `disconnected`, `error` | `platform_connections.status` |
 | `absence_status` | `away`, `maintenance` | `profiles.absence_status` |
 | `app_install_status` | `active`, `inactive`, `error` | `installed_apps.status` |
 | `app_install_source` | `marketplace`, `sideloaded` | `installed_apps.source` |
@@ -14,8 +16,6 @@ This document describes the application-domain schema defined in `packages/share
 | `application_status` | `pending`, `approved`, `rejected` | `applications.status` |
 | `editor_mode` | `simple`, `advanced` | `application_flows.editor_mode` |
 | `landing_section_status` | `draft`, `published` | `landing_sections.status` |
-| `platform_type` | `discord`, `matrix` | `platform_connections.platform`, `user_platform_accounts.platform`, `users.primary_platform`, `voice_sessions.platform` |
-| `platform_connection_status` | `connected`, `disconnected`, `error` | `platform_connections.status` |
 
 ## Tables
 
