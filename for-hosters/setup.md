@@ -35,6 +35,32 @@ pnpm db:generate  # generates a new migration file
 pnpm db:migrate   # applies it
 ```
 
+## Environment Variables
+
+See [configuration.md](./configuration.md) for the full reference. Key Discord-related variables:
+
+| Variable | Purpose | Example |
+|---|---|---|
+| `DISCORD_OAUTH_CLIENT_ID` | Discord OAuth app client ID | `123456789012345678` |
+| `DISCORD_OAUTH_CLIENT_SECRET` | Discord OAuth app client secret | `secret...` |
+| `DISCORD_OAUTH_REDIRECT_URI` | OAuth redirect URI | `https://hub.example.com/api/auth/discord` |
+| `DISCORD_BOT_TOKEN` | Discord bot token | `Bot ...` |
+| `DISCORD_GUILD_ID` | Target Discord guild ID | `987654321098765432` |
+| `SUPERADMIN_DISCORD_ID` | Initial superadmin Discord user ID | `111222333444555666` |
+
+> **Setup wizard pre-fill:** When `DISCORD_BOT_TOKEN`, `DISCORD_OAUTH_CLIENT_ID`, `DISCORD_OAUTH_CLIENT_SECRET`, and `DISCORD_GUILD_ID` are set in the Hub's runtime config, the setup wizard's "Connect a Platform" step pre-fills those fields automatically.
+
+## Setup Wizard
+
+After starting the hub (`pnpm dev`), open `http://localhost:3003/setup` (or `/de/setup` for German). Complete all steps:
+
+1. **Community Info** — community name, description, default locale
+2. **Admin Account** — admin display name, email
+3. **Connect a Platform** — Discord credentials (pre-fills from env vars if set)
+4. **Review** — confirm and complete
+
+The wizard is fully internationalized (EN/DE). The language switcher in the top-right corner changes translations. Direct navigation to `/de/setup` renders in German without redirect.
+
 ## Local Development
 
 Start all services:
