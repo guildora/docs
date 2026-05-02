@@ -19,15 +19,16 @@ Key groups:
   - `HUB_HOST` + `NUXT_PUBLIC_HUB_URL` for internal app (`hub`)
   - `NUXT_PUBLIC_MARKETPLACE_EMBED_URL` for the hub marketplace iframe target
 - database: `DATABASE_URL`, optional `DATABASE_SSL`
-- hub auth: `NUXT_SESSION_PASSWORD`, Discord OAuth vars, `SUPERADMIN_DISCORD_ID`, optional `NUXT_AUTH_DEV_BYPASS`
+- hub auth: `NUXT_SESSION_PASSWORD`, `DISCORD_OAUTH_CLIENT_ID`, `DISCORD_OAUTH_CLIENT_SECRET`, `DISCORD_OAUTH_REDIRECT_URI`, `SUPERADMIN_DISCORD_ID`, optional `NUXT_AUTH_DEV_BYPASS`
 - bot bridge: `BOT_INTERNAL_URL`, `BOT_INTERNAL_TOKEN`, `BOT_INTERNAL_PORT`
-- bot runtime: `DISCORD_BOT_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID`, optional `AFK_VOICE_CHANNEL_ID`
+- bot runtime: `DISCORD_BOT_TOKEN`, `DISCORD_BOT_APPLICATION_ID`, `DISCORD_GUILD_ID`, optional `AFK_VOICE_CHANNEL_ID`, optional `DISCORD_WEBHOOK_URL`
 - optional UI runtime toggles: `NUXT_PUBLIC_DEFAULT_THEME`, `NUXT_PUBLIC_ENABLE_PERFORMANCE_DEBUG`
 
 Important auth rule:
 
-- `NUXT_OAUTH_DISCORD_REDIRECT_URI` must target hub, for example `https://hub.example.com/api/auth/discord`.
-- If it is accidentally pointed at landing, landing can only forward the request to hub; it does not complete OAuth itself.
+- `DISCORD_OAUTH_REDIRECT_URI` must target the Hub's main Discord OAuth endpoint, for example `https://hub.example.com/api/auth/discord`.
+- The setup wizard uses a separate endpoint (`/api/auth/discord/setup`) which requires its own redirect URI registered in the Discord application. Add the setup redirect URI in the Discord Developer Portal under your application's "OAuth2 URL Generator": `https://hub.example.com/api/auth/discord/setup`.
+- If the main redirect URI is accidentally pointed at landing, landing can only forward the request to hub; it does not complete OAuth itself.
 
 ## Local Development
 
