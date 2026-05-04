@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": "2.3",
+  "version": "3.0",
   "description": "Action registry for the current Nuxt/Nitro surface. Hub owns the operational API; web only provides a compatibility redirect for /api/auth/discord.",
   "actions": [
     { "id": "auth-discord", "name": "Discord OAuth", "method": "GET", "path": "/api/auth/discord", "requiredRoles": [], "docsRef": "../docs/api-contracts.md#auth" },
@@ -103,6 +103,16 @@
 
     { "id": "marketplace-apps", "name": "List marketplace apps", "method": "GET", "path": "/api/marketplace/apps", "requiredRoles": ["temporaer", "user", "moderator", "admin", "superadmin"] },
     { "id": "feedback-submit", "name": "Submit feedback", "method": "POST", "path": "/api/feedback", "requiredRoles": ["temporaer", "user", "moderator", "admin", "superadmin"] },
-    { "id": "public-branding", "name": "Get public branding", "method": "GET", "path": "/api/public/branding", "requiredRoles": [] }
+    { "id": "public-branding", "name": "Get public branding", "method": "GET", "path": "/api/public/branding", "requiredRoles": [] },
+
+    { "id": "admin-platforms-list", "name": "List platform connections", "method": "GET", "path": "/api/admin/platforms", "requiredRoles": ["admin", "superadmin"] },
+    { "id": "admin-platforms-create", "name": "Create platform connection", "method": "POST", "path": "/api/admin/platforms", "requiredRoles": ["admin", "superadmin"] },
+    { "id": "admin-platforms-update", "name": "Update platform connection", "method": "PUT", "path": "/api/admin/platforms/:id", "requiredRoles": ["admin", "superadmin"] },
+    { "id": "admin-platforms-delete", "name": "Delete platform connection", "method": "DELETE", "path": "/api/admin/platforms/:id", "requiredRoles": ["admin", "superadmin"] },
+    { "id": "admin-platforms-test", "name": "Test platform connection", "method": "POST", "path": "/api/admin/platforms/:id/test", "requiredRoles": ["admin", "superadmin"] },
+    { "id": "auth-matrix", "name": "Matrix SSO login", "method": "GET", "path": "/api/auth/matrix", "requiredRoles": [] },
+    { "id": "auth-platforms", "name": "Get available auth platforms", "method": "GET", "path": "/api/auth/platforms", "requiredRoles": [] },
+    { "id": "setup-status", "name": "Check setup status", "method": "GET", "path": "/api/setup/status", "requiredRoles": [] },
+    { "id": "setup-platform", "name": "Initial platform setup", "method": "POST", "path": "/api/setup/platform", "requiredRoles": [] }
   ]
 }
