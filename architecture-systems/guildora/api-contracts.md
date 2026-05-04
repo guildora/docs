@@ -28,6 +28,8 @@ See also [`permissions-matrix.md`](./permissions-matrix.md).
 | --- | --- | --- | --- |
 | GET | `/api/auth/discord` | public | Discord OAuth start/callback and session creation |
 | GET | `/:locale/api/auth/discord` (`en`,`de`) | public | compatibility redirect to `/api/auth/discord` preserving query params |
+| GET | `/api/auth/matrix` | public | Matrix SSO login (redirect to homeserver, callback with loginToken) |
+| GET | `/api/auth/platforms` | public | Get available auth platforms for login page |
 | POST | `/api/auth/logout` | public | clear the current session |
 
 ### Web Compatibility Shim
@@ -258,6 +260,23 @@ When `membership_settings.applications_required = false`:
 | DELETE | `/api/settings/files/bucket` | admin | delete entire storage bucket |
 | POST | `/api/settings/files/migrate` | admin | migrate file storage between providers |
 | POST | `/api/settings/files/test-connection` | admin | test storage connection settings |
+
+## Platform Management
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/admin/platforms` | admin | list all platform connections (without credentials) |
+| POST | `/api/admin/platforms` | admin | connect a new platform (Discord or Matrix) |
+| PUT | `/api/admin/platforms/:id` | admin | update platform connection config |
+| DELETE | `/api/admin/platforms/:id` | admin | disconnect a platform |
+| POST | `/api/admin/platforms/:id/test` | admin | test platform bot connection health |
+
+## Initial Setup
+
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/setup/status` | public | check if initial platform setup is needed |
+| POST | `/api/setup/platform` | public | initial platform connection setup (only works when no platforms exist) |
 
 ## Internal Landing (MCP / Internal Token Auth)
 
